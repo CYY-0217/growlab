@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 密钥
+.env
+
+# 数据库（本地数据不进仓库）
+*.db
+*.db-shm
+*.db-wal
+
+# 备份与系统文件
+*.bak*
+.DS_Store

@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人成长实验室</title>
+<style>
+:root{
+  --bg:#F3E3D5; --surface:#FBF3E3; --surface-2:#EFE2C8; --border:#D4B98F;
+  --text:#2C2418; --muted:#6E5A3E; --primary:#3E4630; --gold:#C89B5A;
+  --gold-2:#E0B15D; --rust:#853C1E; --success:#4C6B4A; --warning:#9D612E; --danger:#853C1E;
+  --radius:16px; --shadow:0 4px 18px rgba(60,45,20,.12); --ease:cubic-bezier(.22,1,.36,1);
+}
+[data-theme="dark"]{
+  --bg:#2B3322; --surface:#39422E; --surface-2:#454E35; --border:#5A6448;
+  --text:#F3E3D5; --muted:#B9AC92; --primary:#E0B15D; --gold:#C89B5A;
+  --gold-2:#E5C592; --rust:#B0642F; --success:#8FAE84; --warning:#C99A5B; --danger:#C96B4B;
+  --shadow:0 4px 18px rgba(0,0,0,.4);
+}
+/* ===== Seder 新艺术植物纹样 · 四套可选色板（默认原版，右上角下拉切换，可随时回退） ===== */
+[data-theme="seder-gold"]{
+  --bg:#E8DCC3; --surface:#EBE0CA; --surface-2:#DCCDA9; --border:#1F2A24;
+  --text:#1F2A24; --muted:#575C51; --primary:#8A6D1F; --gold:#8A6D1F;
+  --gold-2:#6E5514; --rust:#5C3A2E;
+}
+[data-theme="seder-iris"]{
+  --bg:#D8D4C8; --surface:#DDD9CF; --surface-2:#C4BFB0; --border:#23203A;
+  --text:#23203A; --muted:#565262; --primary:#3E4E8C; --gold:#3E4E8C;
+  --gold-2:#2E3C70; --rust:#6B4E7E;
+}
+[data-theme="seder-pergament"]{
+  --bg:#EDE4D0; --surface:#EFE7D6; --surface-2:#E0D4BA; --border:#3A2F23;
+  --text:#3A2F23; --muted:#6C6253; --primary:#5C4A2E; --gold:#5C4A2E;
+  --gold-2:#463820; --rust:#7A3B2E;
+}
+[data-theme="seder-distel"]{
+  --bg:#E3D5BF; --surface:#E6DAC7; --surface-2:#D2C1A4; --border:#2A2620;
+  --text:#2A2620; --muted:#5E574D; --primary:#9A4632; --gold:#9A4632;
+  --gold-2:#7D3626; --rust:#4E5B3A;
+}
+[data-theme="seder-gold"] .bg::after{background:radial-gradient(130% 95% at 50% 42%, rgba(232,220,195,.82) 32%, rgba(232,220,195,.55) 78%, rgba(232,220,195,.30) 100%)}
+[data-theme="seder-iris"] .bg::after{background:radial-gradient(130% 95% at 50% 42%, rgba(216,212,200,.82) 32%, rgba(216,212,200,.55) 78%, rgba(216,212,200,.30) 100%)}
+[data-theme="seder-pergament"] .bg::after{background:radial-gradient(130% 95% at 50% 42%, rgba(237,228,208,.82) 32%, rgba(237,228,208,.55) 78%, rgba(237,228,208,.30) 100%)}
+[data-theme="seder-distel"] .bg::after{background:radial-gradient(130% 95% at 50% 42%, rgba(227,213,191,.82) 32%, rgba(227,213,191,.55) 78%, rgba(227,213,191,.30) 100%)}
+select.theme-sel{appearance:none;-webkit-appearance:none;cursor:pointer;background:var(--surface);color:var(--muted);font:inherit;padding:5px 10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+  background:var(--bg);color:var(--text);line-height:1.65;
+  -webkit-font-smoothing:antialiased;padding-bottom:60px}
+.wrap{max-width:960px;margin:0 auto;padding:24px 16px 10px;position:relative;z-index:1}
+
+/* ===== 虚化背景层：穆夏参考图 + 径向柔光（中心盖住文字，四周透出画作） ===== */
+.bg{position:fixed;inset:-50px;z-index:0;pointer-events:none;
+  background:url('/static/img/0afab5fdced544edc72ea9a3ad81ae0b.jpg') center/cover no-repeat;
+  filter:blur(7px) saturate(1.08);transform:scale(1.04);}
+.bg::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(130% 95% at 50% 42%,
+    rgba(243,227,213,.82) 32%, rgba(243,227,213,.55) 78%, rgba(243,227,213,.30) 100%);}
+[data-theme="dark"] .bg::after{
+  background:radial-gradient(130% 95% at 50% 42%,
+    rgba(43,51,34,.86) 32%, rgba(43,51,34,.58) 78%, rgba(43,51,34,.32) 100%);}
+
+/* ===== 页眉 ===== */
+header{text-align:center;margin-bottom:6px;position:relative}
+.hdr-orn{display:block;width:100%;max-width:340px;margin:0 auto 2px;color:var(--gold)}
+h1{font-size:30px;font-weight:600;letter-spacing:4px;line-height:1.25}
+h1 .fl{color:var(--rust);font-style:italic;font-size:15px;font-weight:400;
+  letter-spacing:1px;margin-left:10px;display:block}
+.sub{color:var(--muted);font-size:13px;margin-top:4px;letter-spacing:2px}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:20px;
+  color:var(--muted);padding:5px 12px;font-size:13px;cursor:pointer;
+  position:absolute;top:2px;right:0}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold-2)}
+
+/* ===== 花边分隔线 ===== */
+.orn-divider{display:block;width:100%;max-width:420px;margin:6px auto 4px;color:var(--gold)}
+.orn-divider line,.orn-divider path,.orn-divider circle{stroke:currentColor}
+
+/* ===== 用户选择器 ===== */
+.userselect{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  margin:14px 0 6px;justify-content:center}
+.userselect .lbl{font-size:12px;color:var(--muted);letter-spacing:1px}
+.usertag{padding:5px 16px;border:1px solid var(--border);border-radius:20px;
+  font-size:13px;cursor:pointer;background:var(--surface)}
+.usertag:hover{border-color:var(--gold)}
+.usertag.on{background:var(--primary);color:var(--surface);border-color:var(--primary)}
+
+/* ===== 导航 ===== */
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 20px;justify-content:center}
+nav button{font-family:inherit;border:1px solid var(--border);border-radius:24px;
+  background:var(--surface);color:var(--text);padding:8px 18px;font-size:14px;
+  cursor:pointer;letter-spacing:1px}
+nav button:hover{border-color:var(--gold);color:var(--rust)}
+nav button.on{background:var(--primary);color:var(--surface);border-color:var(--primary)}
+
+/* ===== 卡片（穆夏装饰框：四角花边 + 双层金线） ===== */
+.card{position:relative;background-color:var(--surface);
+  border:1px solid rgba(200,155,90,.5);border-radius:14px;
+  padding:34px 30px 26px;margin-bottom:16px;box-shadow:var(--shadow);
+  background-image:url('/static/orn/corner-tl.svg'),url('/static/orn/corner-tr.svg'),
+    url('/static/orn/corner-bl.svg'),url('/static/orn/corner-br.svg');
+  background-repeat:no-repeat;
+  background-position:top left, top right, bottom left, bottom right;
+  background-size:48px 48px,48px 48px,48px 48px,48px 48px;}
+.card::before{content:"";position:absolute;inset:9px;border:1px solid rgba(200,155,90,.22);
+  border-radius:9px;pointer-events:none}
+.section-t{font-size:12px;font-weight:600;color:var(--rust);letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:12px;padding-left:12px;
+  border-left:3px solid var(--gold);line-height:1.5}
+.muted{color:var(--muted);font-size:12px}
+button.act{font-family:inherit;border:1px solid var(--border);border-radius:12px;
+  background:var(--surface-2);color:var(--text);padding:8px 16px;font-size:13px;cursor:pointer}
+button.act:hover{border-color:var(--gold)}
+button.primary{background:var(--primary);color:var(--surface);border-color:var(--primary)}
+button.danger{border-color:var(--danger);color:var(--danger)}
+input,textarea,select{font-family:inherit;background:var(--surface-2);color:var(--text);
+  border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:14px;width:100%}
+textarea{resize:vertical;min-height:60px}
+label{font-size:12px;color:var(--muted);display:block;margin:8px 0 3px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1}
+.row .narrow{flex:0 0 auto}
+
+/* ===== 场景卡片 ===== */
+.scene{display:flex;gap:12px;align-items:center;padding:14px 16px;border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:8px;cursor:pointer;background:var(--surface-2);
+  transition:border-color .2s,transform .2s}
+.scene:hover{border-color:var(--gold);transform:translateX(2px)}
+.scene .t{font-size:15px;font-weight:600}
+.scene .m{color:var(--muted);font-size:12px}
+
+/* ===== 剧场对话（带头像） ===== */
+.chat{display:flex;flex-direction:column;gap:12px;margin:14px 0}
+.msg{display:flex;gap:9px;align-items:flex-start}
+.msg.user{flex-direction:row-reverse}
+.avatar{width:36px;height:36px;border-radius:50%;flex:0 0 auto;
+  background:var(--surface-2);border:1px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  box-shadow:0 0 0 2px rgba(200,155,90,.15)}
+.bubble{max-width:80%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.5}
+.bubble.user{background:var(--primary);color:var(--surface);border-bottom-right-radius:4px}
+.bubble.char{background:var(--surface-2);border-bottom-left-radius:4px;border:1px solid var(--border)}
+.bubble .who{font-size:11px;color:var(--muted);margin-bottom:2px;display:block}
+.eval{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.badge{font-size:11px;padding:3px 12px;border-radius:14px;border:1px solid var(--border)}
+.badge.ok{color:var(--success);border-color:var(--success)}
+.badge.no{color:var(--danger);border-color:var(--danger)}
+
+.md{background:var(--surface-2);border-radius:12px;padding:14px 16px;font-size:13px;
+  white-space:pre-wrap;line-height:1.65;border:1px solid var(--border)}
+.md h1,.md h2,.md h3{font-size:15px;margin:8px 0 4px;color:var(--rust)}
+.md table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+.md td,.md th{border:1px solid var(--border);padding:5px 8px;text-align:left}
+.hidden{display:none}
+.list-item{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--border);
+  border-radius:12px;margin-bottom:8px;font-size:13px;background:var(--surface-2)}
+.list-item .grow{flex:1}
+.ornament{color:var(--gold);font-size:15px;letter-spacing:6px;text-align:center;margin:6px 0 2px}
+
+/* ===== 成长宠物 ===== */
+.pet-head{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.pet-emoji{width:76px;height:76px;border-radius:50%;background:var(--surface-2);
+  border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;
+  font-size:40px;box-shadow:0 0 0 3px rgba(200,155,90,.15)}
+.pet-info{flex:1;min-width:0}
+.pet-name{font-size:18px;font-weight:600;letter-spacing:1px}
+.pet-stage{font-size:12px;color:var(--rust);margin-left:6px;font-weight:400}
+.pet-expbar{height:8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);
+  margin-top:7px;overflow:hidden}
+.pet-expbar .pfill{display:block;height:100%;background:linear-gradient(90deg,var(--gold-2),var(--gold));
+  border-radius:6px;transition:width .3s}
+.pbar{display:flex;align-items:center;gap:8px;margin:8px 0}
+.plbl{font-size:12px;color:var(--muted);width:34px}
+.ptrack{flex:1;height:10px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);overflow:hidden}
+.pfill{display:block;height:100%;border-radius:6px;transition:width .3s}
+.pnum{font-size:12px;color:var(--muted);width:26px;text-align:right}
+.pet-ev{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--border);
+  border-radius:10px;margin-bottom:6px;font-size:13px;background:var(--surface-2)}
+.pet-exp{margin-left:auto;color:var(--gold);font-size:12px}
+/* 宠物 duangduang 弹性待机动画 */
+@keyframes duang{
+  0%,100%{transform:translateY(0) scale(1,1)}
+  25%{transform:translateY(-3px) scale(1.07,.93)}
+  50%{transform:translateY(0) scale(.95,1.07)}
+  72%{transform:translateY(-1px) scale(1.04,.96)}
+}
+.pet-emoji{animation:duang 2.6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.pet-emoji{animation:none}}
+
+/* ===== 成长卡牌 ===== */
+.cards-top{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+.draw-big{font-size:22px;font-weight:600;color:var(--rust)}
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:12px;margin-top:10px}
+.cardcell{position:relative;aspect-ratio:2/3;border-radius:10px;overflow:hidden;
+  border:1px solid var(--gold);background:var(--surface-2);box-shadow:0 2px 8px rgba(60,45,20,.12)}
+.cardcell img{width:100%;height:100%;object-fit:cover;display:block}
+.cardcap{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;text-align:center;
+  font-size:12px;color:var(--surface);background:linear-gradient(transparent,rgba(43,51,34,.82));letter-spacing:1px}
+.cardback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 40%,var(--surface) 0%,var(--surface-2) 100%);
+  color:var(--gold);font-size:22px;opacity:.55}
+.flip-scene{perspective:1000px;width:180px;aspect-ratio:2/3;margin:4px auto 6px}
+.flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.85,.25,1)}
+.flip-inner.flipped{transform:rotateY(180deg)}
+.flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:12px;border:1px solid var(--gold);overflow:hidden}
+.flip-back{background:radial-gradient(circle at 50% 40%,var(--surface) 0%,var(--surface-2) 100%);
+  display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:28px}
+.flip-front{transform:rotateY(180deg);background:var(--surface)}
+
+/* ===== 自律 todo ===== */
+.disc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
+.dstat{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;
+  padding:12px;text-align:center}
+.dstat .dnum{font-size:24px;font-weight:700;color:var(--rust)}
+.dstat .dlbl{font-size:11px;color:var(--muted);margin-top:2px}
+.habit{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;
+  background:var(--surface-2);margin-bottom:7px;border:1px solid transparent;cursor:pointer;transition:.15s}
+.habit:hover{border-color:var(--gold)}
+.habit.checked{border-color:var(--success);background:var(--surface)}
+.habit .box{width:22px;height:22px;border-radius:7px;border:2px solid var(--border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--surface)}
+.habit.checked .box{background:var(--success);border-color:var(--success)}
+.habit .hname{font-size:14px}
+.habit.checked .hname{color:var(--muted);text-decoration:line-through}
+.heat{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;margin-top:6px}
+.heat .cell{aspect-ratio:1;border-radius:5px;background:var(--surface-2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted)}
+.heat .cell.full{background:var(--success);border-color:var(--success);color:var(--surface)}
+.heat .cell.part{background:linear-gradient(135deg,var(--success) 0%,var(--surface-2) 100%)}
+.heat .cell.plan{border-style:dashed}
+.heat .cell.has-plan{border-color:var(--gold);color:var(--rust);font-weight:600}
+.timer-clock{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px;
+  text-align:center;color:var(--rust);margin:6px 0}
+/* 交接弹层 */
+.modal{position:fixed;inset:0;background:rgba(30,24,14,.5);display:none;
+  align-items:center;justify-content:center;z-index:60;padding:16px}
+.modal.show{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--gold);border-radius:14px;
+  padding:20px;max-width:440px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.modal-box h3{margin-bottom:2px}
+/* 导演设置 */
+.dir-lbl{font-size:12px;color:var(--muted);margin-top:10px;display:block;margin-bottom:4px}
+.dir-row{display:flex;gap:8px;flex-wrap:wrap}
+.dir-opt{padding:6px 13px;border:1px solid var(--border);border-radius:20px;
+  font-size:13px;cursor:pointer;background:var(--surface-2)}
+.dir-opt.on{background:var(--primary);color:var(--surface);border-color:var(--primary)}
+/* 经验卡 */
+.expcard{border:1px solid var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:10px;
+  background:var(--surface-2);position:relative}
+.expcard .tag{font-size:10px;color:var(--rust);border:1px solid var(--rust);
+  padding:1px 7px;border-radius:10px;margin-left:6px;vertical-align:2px}
+.handoff-banner{background:var(--surface-2);border:1px dashed var(--gold);border-radius:10px;
+  padding:9px 12px;margin-bottom:10px;font-size:13px}
+/* 农场场景 */
+.farm-scene{position:relative;border-radius:14px;overflow:hidden;padding:12px;
+  background:linear-gradient(180deg,#b8ddf0 0%,#d9eed2 52%,#93c46f 100%);
+  border:1px solid var(--border)}
+.farm-scene .house{position:absolute;top:10px;left:14px;font-size:38px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+.farm-scene .sun{position:absolute;top:12px;right:16px;font-size:28px}
+.farm-scene .fence{position:absolute;bottom:6px;left:0;right:0;height:10px;
+  background:repeating-linear-gradient(90deg,#8a6a3f 0 12px,#f3e3d5 12px 16px);
+  border-radius:3px;opacity:.5}
+.farm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:52px;position:relative;z-index:1}
+.plot{aspect-ratio:1;border-radius:11px;
+  background:linear-gradient(180deg,#9c6b3a,#7c5226);border:2px solid #5f3d1c;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.25);
+  display:flex;align-items:center;justify-content:center;font-size:30px;cursor:pointer;transition:.15s}
+.plot.empty{border-style:dashed;border-color:#6b4a24;background:rgba(255,255,255,.12);color:#5f3d1c;font-size:22px}
+.plot:hover{transform:translateY(-2px)}
+.plot.ripe{box-shadow:0 0 0 3px var(--gold-2), inset 0 2px 5px rgba(0,0,0,.25)}
+.plot.wilted{opacity:.55}
+.crop-tag{font-size:20px;cursor:pointer;margin-left:5px}
+.crop-tag:hover{transform:scale(1.15)}
+.comm-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);
+  border-radius:11px;margin-bottom:7px;background:var(--surface-2)}
+[data-theme="dark"] .farm-scene{background:linear-gradient(180deg,#2c3a33 0%,#394a38 52%,#33402c 100%);
+  border-color:var(--border)}
+[data-theme="dark"] .plot{background:linear-gradient(180deg,#6b4a2a,#48341f);border-color:#3a2a16}
+[data-theme="dark"] .plot.empty{background:rgba(0,0,0,.16);color:#9c8258;border-color:#5c4630}
+[data-theme="dark"] .farm-scene .fence{background:repeating-linear-gradient(90deg,#5c4a30 0 12px,#3a4430 12px 16px)}
+/* 探索首页 · 标本编辑 + 记忆图谱 */
+.specimen{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:28px 26px;margin-bottom:16px}
+.spec-kicker{font-size:11px;letter-spacing:3px;color:var(--muted);
+  text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.spec-kicker::after{content:"";flex:1;height:1px;background:var(--border)}
+.specimen h2{font-size:26px;font-weight:600;letter-spacing:2px;margin:8px 0 4px;color:var(--text)}
+.spec-sub{font-size:13px;color:var(--muted);line-height:1.7;max-width:60ch}
+.spec-rule{border:none;border-top:1px solid var(--border);margin:16px 0}
+.spec-label{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+  padding:16px 14px 12px;position:relative;margin-top:4px}
+.spec-no{position:absolute;top:-9px;left:12px;font-size:10px;letter-spacing:1px;
+  background:var(--rust);color:var(--surface);padding:1px 9px;border-radius:10px}
+.spec-label textarea{background:transparent;border:none;font-size:15px;min-height:56px;
+  padding:2px 0;width:100%;box-shadow:none;outline:none}
+.spec-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.spec-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:14px;display:flex;flex-direction:column;gap:4px}
+.spec-card .no{font-size:10px;color:var(--muted);letter-spacing:1.5px}
+.spec-card .nm{font-size:15px;font-weight:600;line-height:1.4}
+.spec-card .why{font-size:12px;color:var(--muted);line-height:1.55;flex:1}
+.spec-card .rule{border-top:1px solid var(--border);margin:8px 0 2px}
+.spec-card.first{grid-column:1/-1;border-color:var(--rust);
+  box-shadow:0 4px 16px rgba(133,60,30,.14)}
+
+@media(max-width:600px){h1{font-size:24px}.bubble{max-width:95%}.card{padding:30px 20px 22px}.spec-grid{grid-template-columns:1fr}}
+
+/* ===== 动效系统（统一缓动 · 视图切换入场 · hover/按压微交互） ===== */
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes ruleGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.hdr-orn{animation:rise .9s var(--ease) both}
+.orn-divider{animation:rise 1s var(--ease) both .08s}
+#main.view-anim>*{animation:rise .5s var(--ease) both}
+#main.view-anim>*:nth-child(2){animation-delay:.06s}
+#main.view-anim>*:nth-child(3){animation-delay:.12s}
+#main.view-anim>*:nth-child(4){animation-delay:.18s}
+#main.view-anim>*:nth-child(5){animation-delay:.24s}
+.cardcell{transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.cardcell:hover{transform:translateY(-3px)}
+button.act,nav button,.usertag,.dir-opt,.habit,.list-item,.spec-card{
+  transition:border-color .2s,color .2s,background .2s,transform .16s var(--ease)}
+button.act:active,nav button:active,.usertag:active,.dir-opt:active{transform:scale(.96)}
+.spec-card:hover{transform:translateY(-3px)}
+@media(prefers-reduced-motion:reduce){#main.view-anim>*{animation:none}}
+
+/* ===== Bento 空间网格（首页启动器 · 参考 saaspo/supahero） ===== */
+#nav{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0 20px}
+#nav button.bento{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+  gap:5px;text-align:left;padding:14px 15px;border:1px solid var(--border);border-radius:14px;
+  background:var(--surface);color:var(--text);cursor:pointer;min-height:96px;
+  transition:transform .18s var(--ease),border-color .2s,box-shadow .2s}
+#nav button.bento:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:var(--shadow)}
+#nav button.bento.on{background:var(--surface);color:var(--text);border-color:var(--gold);
+  box-shadow:0 0 0 2px var(--gold-2)}
+#nav .b-ico{font-size:24px;line-height:1}
+#nav .b-t{font-size:15px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+#nav .b-d{font-size:11.5px;color:var(--muted);line-height:1.45}
+#nav .b-tag{font-size:10px;color:var(--rust);border:1px solid var(--rust);border-radius:9px;padding:0 7px;line-height:1.7}
+#nav button.b-feat{grid-column:span 2;justify-content:center;gap:8px;padding:20px 22px;min-height:120px;
+  background:linear-gradient(135deg,var(--surface) 0%,var(--surface-2) 100%)}
+#nav .b-feat .b-ico{font-size:38px}
+#nav .b-feat .b-t{font-size:21px}
+#nav .b-feat .b-d{font-size:13px;max-width:360px}
+@media(max-width:680px){#nav{grid-template-columns:repeat(2,1fr)}#nav button.b-feat{grid-column:span 2}}
+
+/* ===== Hero 首屏（参考 supahero/seesaw 字阶） ===== */
+header{margin-bottom:12px}
+h1{font-size:42px;letter-spacing:5px}
+h1 .fl{font-size:16px}
+.sub.hero-lead{font-size:16px;color:var(--text);letter-spacing:1px;margin-top:10px;font-weight:500}
+.sub.loop-line{font-size:11px;letter-spacing:3px;margin-top:6px;opacity:.85}
+@media(max-width:600px){h1{font-size:30px}}
+
+/* ===== 规划视图（文字驱动 · 动效优先） ===== */
+.plan-input{display:flex;gap:10px;align-items:flex-start;margin:8px 0}
+.plan-input textarea{flex:1;min-height:64px}
+.plan-input .act{align-self:flex-end}
+/* loading 呼吸点 */
+.loading{display:flex;gap:4px;align-items:center;padding:8px 0}
+.loading .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:blink 1.2s infinite}
+.loading .dot:nth-child(2){animation-delay:.2s}
+.loading .dot:nth-child(3){animation-delay:.4s}
+.loading-txt{font-size:12px;color:var(--muted);margin-left:6px}
+@keyframes blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+/* 操作预览卡 */
+#plan_ops{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.op-card{border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--surface-2);
+  animation:rise .4s var(--ease) both;transition:opacity .3s,border-color .3s}
+.op-card.op-err{animation:shake .4s;border-color:var(--danger)}
+.op-card.op-done{border-color:var(--success)}
+.op-card.op-cancelled{opacity:.55}
+.op-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.op-title{font-weight:600}
+.op-badge{font-size:11px;padding:1px 8px;border-radius:9px;border:1px solid var(--border)}
+.op-badge.ok{color:var(--success);border-color:var(--success)}
+.op-badge.warn{color:var(--warning);border-color:var(--warning)}
+.op-badge.no{color:var(--danger);border-color:var(--danger)}
+.op-badge.info{color:var(--primary);border-color:var(--primary)}
+.op-meta{font-size:12px;color:var(--muted);margin-bottom:2px}
+.op-note{font-size:13px}
+.op-ask{font-size:12px;color:var(--rust);margin-top:2px}
+.op-acts{display:flex;gap:8px;margin-top:8px}
+.op-result{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.op-done-txt{color:var(--success);font-weight:600}
+.conflict{font-size:12px;color:var(--danger);border:1px solid var(--danger);border-radius:8px;
+  padding:6px 9px;background:rgba(133,60,30,.06);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(133,60,30,.18)}50%{box-shadow:0 0 0 5px rgba(133,60,30,.05)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+.adj-cand{font-size:13px;border:1px dashed var(--gold);border-radius:8px;padding:6px 9px;animation:rise .3s var(--ease) both}
+/* 日程 + 量化 */
+#plan_schedule{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.sched-day-h{font-size:12px;color:var(--rust);letter-spacing:.06em;margin:10px 0 4px;font-weight:600}
+.sched-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border:1px solid var(--border);
+  border-radius:9px;background:var(--surface-2);animation:rise .35s var(--ease) both}
+.sched-item.cancelled{opacity:.5;text-decoration:line-through}
+.sched-time{font-family:ui-monospace,monospace;font-size:12px;color:var(--rust);white-space:nowrap}
+.sched-title{font-size:13px}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.metric-cell{border:1px solid var(--border);border-radius:9px;padding:9px;text-align:center;
+  background:var(--surface-2);animation:rise .35s var(--ease) both}
+.metric-cell.has{border-color:var(--gold)}
+.m-n{font-size:11px;color:var(--muted)}
+.m-v{font-size:20px;font-weight:700;color:var(--rust);margin-top:2px}
+@media(max-width:600px){.metric-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== 单页滚动 + 分区 + 滚动显现 ===== */
+.sec{scroll-margin-top:16px;position:relative}
+.sec + .sec{margin-top:48px}
+.sec + .sec::before{content:"";position:absolute;top:-24px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold) 32%,var(--gold) 68%,transparent);opacity:.5}
+.sec + .sec::after{content:"❦";position:absolute;top:-31px;left:50%;transform:translateX(-50%);
+  color:var(--gold);font-size:13px;line-height:1}
+.sec-h{display:flex;align-items:center;gap:12px;margin:0 0 16px}
+.sec-h .sh-ico{font-size:28px;line-height:1}
+.sec-h .sh-t{font-size:30px;font-weight:700;letter-spacing:.06em;line-height:1.15;margin:0}
+.sec-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.6}
+.sec-h,.sec-body{opacity:0;transform:translateY(26px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.sec.in .sec-h,.sec.in .sec-body{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+<div class="wrap">
+  <header>
+    <svg class="hdr-orn" viewBox="0 0 340 36" fill="none" aria-hidden="true">
+      <g stroke-linecap="round" stroke-width="1">
+        <path d="M0 18 C40 18 60 18 104 18" stroke="currentColor"/>
+        <path d="M236 18 C280 18 300 18 340 18" stroke="currentColor"/>
+        <path d="M104 18 c-8 -9 -18 -9 -22 -2 4 6 14 6 22 2Z" fill="currentColor" opacity=".5"/>
+        <path d="M236 18 c8 -9 18 -9 22 -2 -4 6 -14 6 -22 2Z" fill="currentColor" opacity=".5"/>
+        <path d="M124 18 c-3 -6 -10 -8 -14 -4 1 5 8 6 14 4Z" fill="currentColor" opacity=".3"/>
+        <path d="M216 18 c3 -6 10 -8 14 -4 -1 5 -8 6 -14 4Z" fill="currentColor" opacity=".3"/>
+      </g>
+      <g transform="translate(170,18)">
+        <circle r="7" stroke="currentColor" fill="none" stroke-width="1"/>
+        <path d="M0 -7 C2 -2 2 2 0 7" stroke="currentColor" fill="none" stroke-width="1"/>
+        <path d="M0 -7 C-2 -2 -2 2 0 7" stroke="currentColor" fill="none" stroke-width="1"/>
+        <path d="M-7 0 C-2 2 2 2 7 0" stroke="currentColor" fill="none" stroke-width="1"/>
+        <path d="M-7 0 C-2 -2 2 -2 7 0" stroke="currentColor" fill="none" stroke-width="1"/>
+        <circle r="2.2" fill="currentColor"/>
+      </g>
+    </svg>
+    <h1>个人成长实验室<span class="fl">Art&nbsp;Nouveau</span></h1>
+    <div class="sub hero-lead">不以牺牲身心状态为代价的学习成长 Agent</div>
+    <div class="sub loop-line">探索 → 模拟 → 行动 → 反馈 → 理解自己</div>
+  </header>
+  <select id="themeSel" class="icon-btn theme-sel" onchange="setTheme(this.value)" title="切换主题">
+    <option value="light">🎨 原版</option>
+    <option value="dark">🌙 暗色</option>
+    <option value="seder-gold">🌾 Seder·金</option>
+    <option value="seder-iris">🪻 Seder·鸢尾</option>
+    <option value="seder-pergament">📜 Seder·羊皮纸</option>
+    <option value="seder-distel">🌿 Seder·蓟</option>
+  </select>
+
+  <svg class="orn-divider" viewBox="0 0 360 34" fill="none" aria-hidden="true">
+    <g stroke-linecap="round">
+      <path d="M14 17 C50 17 80 17 118 17" stroke-width="1" stroke="currentColor"/>
+      <path d="M242 17 C280 17 310 17 346 17" stroke-width="1" stroke="currentColor"/>
+      <path d="M14 17 c-6 -8 -15 -8 -19 -2 4 6 13 6 19 2Z" fill="currentColor" opacity=".5"/>
+      <path d="M346 17 c6 -8 15 -8 19 -2 -4 6 -13 6 -19 2Z" fill="currentColor" opacity=".5"/>
+      <path d="M40 17 c-2 -6 -9 -8 -13 -4 1 5 8 7 13 4Z" fill="currentColor" opacity=".3"/>
+      <path d="M320 17 c2 -6 9 -8 13 -4 -1 5 -8 7 -13 4Z" fill="currentColor" opacity=".3"/>
+      <path d="M150 17 c-3 -6 -10 -8 -14 -4 1 5 8 6 14 4Z" fill="currentColor" opacity=".3"/>
+      <path d="M210 17 c3 -6 10 -8 14 -4 -1 5 -8 6 -14 4Z" fill="currentColor" opacity=".3"/>
+    </g>
+    <g transform="translate(180,17)">
+      <path d="M0 -8 c3 -2 6 -2 8 0 c-3 2 -6 2 -8 0Z" fill="currentColor" opacity=".7"/>
+      <path d="M0 8 c3 2 6 2 8 0 c-3 -2 -6 -2 -8 0Z" fill="currentColor" opacity=".7"/>
+      <path d="M-8 0 c-2 3 -2 6 0 8 c2 -3 2 -6 0 -8Z" fill="currentColor" opacity=".7"/>
+      <path d="M8 0 c2 3 2 6 0 8 c-2 -3 -2 -6 0 -8Z" fill="currentColor" opacity=".7"/>
+      <circle r="3" fill="currentColor"/>
+    </g>
+  </svg>
+
+  <div class="userselect">
+    <span class="lbl">正在服务的学习者：</span>
+    <span id="userTags"></span>
+    <button class="act narrow" onclick="showAddUser()">＋ 添加学习者</button>
+  </div>
+
+  <nav id="nav">
+    <button class="bento b-feat" data-view="plan" onclick="showView('plan')">
+      <span class="b-ico">⚖️</span>
+      <span class="b-t">规划 <span class="b-tag">★ 核心</span></span>
+      <span class="b-d">一句话安排今天——学习与休息一起排，冲突一眼看见，AI 帮你重排到不牺牲自己。</span>
+    </button>
+    <button class="bento" data-view="theater" onclick="showView('theater')">
+      <span class="b-ico">🎭</span><span class="b-t">情境剧场</span>
+      <span class="b-d">换种说法重演——你刚才那句话，在另一个宇宙里可能已经绝交了。</span>
+    </button>
+    <button class="bento" data-view="discipline" onclick="showView('discipline')">
+      <span class="b-ico">📅</span><span class="b-t">自律</span>
+      <span class="b-d">今日目标 · 打卡 · 专注计时</span>
+    </button>
+    <button class="bento" data-view="explore" onclick="showView('explore')">
+      <span class="b-ico">🧭</span><span class="b-t">探索空间</span>
+      <span class="b-d">把迷茫变成可试的方向</span>
+    </button>
+    <button class="bento" data-view="lab" onclick="showView('lab')">
+      <span class="b-ico">🧪</span><span class="b-t">个人实验室</span>
+      <span class="b-d">把收获变成现实小实验</span>
+    </button>
+    <button class="bento" data-view="memory" onclick="showView('memory')">
+      <span class="b-ico">📜</span><span class="b-t">成长档案</span>
+      <span class="b-d">可编辑的成长记忆</span>
+    </button>
+    <button class="bento" data-view="pet" onclick="showView('pet')">
+      <span class="b-ico">🐱</span><span class="b-t">萌宠</span>
+      <span class="b-d">学习行动喂养它成长</span>
+    </button>
+    <button class="bento" data-view="cards" onclick="showView('cards')">
+      <span class="b-ico">🃏</span><span class="b-t">卡牌</span>
+      <span class="b-d">塔罗式收集 · 抽卡</span>
+    </button>
+  </nav>
+
+  <div id="main">
+    <section id="sec-plan" class="sec" data-view="plan">
+      <header class="sec-h"><span class="sh-ico">⚖️</span><h2 class="sh-t">规划</h2></header>
+      <div class="sec-body"></div>
+    </section>
+    <section id="sec-theater" class="sec" data-view="theater">
+      <header class="sec-h"><span class="sh-ico">🎭</span><h2 class="sh-t">情境剧场</h2></header>
+      <div class="sec-body"></div>
+    </section>
+    <section id="sec-discipline" class="sec" data-view="discipline">
+      <header class="sec-h"><span class="sh-ico">📅</span><h2 class="sh-t">自律</h2></header>
+      <div class="sec-body"></div>
+    </section>
+    <section id="sec-explore" class="sec" data-view="explore">
+      <header class="sec-h"><span class="sh-ico">🧭</span><h2 class="sh-t">探索空间</h2></header>
+      <div class="sec-body"></div>
+    </section>
+    <section id="sec-lab" class="sec" data-view="lab">
+      <header class="sec-h"><span class="sh-ico">🧪</span><h2 class="sh-t">个人实验室</h2></header>
+      <div class="sec-body"></div>
+    </section>
+    <section id="sec-memory" class="sec" data-view="memory">
+      <header class="sec-h"><span class="sh-ico">📜</span><h2 class="sh-t">成长档案</h2></header>
+      <div class="sec-body"></div>
+    </section>
+    <section id="sec-pet" class="sec" data-view="pet">
+      <header class="sec-h"><span class="sh-ico">🐱</span><h2 class="sh-t">萌宠</h2></header>
+      <div class="sec-body"></div>
+    </section>
+    <section id="sec-cards" class="sec" data-view="cards">
+      <header class="sec-h"><span class="sh-ico">🃏</span><h2 class="sh-t">卡牌</h2></header>
+      <div class="sec-body"></div>
+    </section>
+  </div>
+  <div class="ornament">❦</div>
+</div>
+
+<div class="modal" id="handoffModal">
+  <div class="modal-box">
+    <h3 id="handoffHead">交接确认</h3>
+    <div class="muted" style="margin-bottom:8px">确认要带过去的内容，可修改。确认前不会写入任何东西。</div>
+    <label>标题</label><input id="handoffTitle">
+    <label>摘要 / 结论</label><textarea id="handoffSummary" style="min-height:72px"></textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="act" onclick="handoffSkip()">跳过</button>
+      <button class="act" onclick="closeHandoff()">返回</button>
+      <button class="act" onclick="handoffPause()">暂停存草稿</button>
+      <button class="act primary" onclick="handoffConfirm()">确认</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let users=[],cur=null,view='plan',curRun=null,curScene=null,lastCompare='';
+let pendingSummary='', lastDirections=[], handoffCfg=null, directorSetup=null;
+
+const BGS={
+  explore:{l:'/static/img/0afab5fdced544edc72ea9a3ad81ae0b.jpg'},
+  theater:{l:'/static/img/1040g0k0325kb9lsjka005piconajcloug6cgjpo!nd_dft_wgth_jpg_3.JPEG'},
+  lab:{l:'/static/img/1040g0k0325kb9lsjka105piconajcloug8ttbi8!nd_dft_wgth_jpg_3.JPEG'},
+  memory:{l:'/static/img/1040g0k0325kb9lsjka1g5piconajclounednaag!nd_dft_wgth_jpg_3.JPEG'},
+  pet:{l:'/static/img/1040g0k0325kb9lsjka2g5piconajcloutdg3758!nd_dft_wgth_jpg_3.JPEG'},
+  cards:{l:'/static/img/1040g0k0325kb9lsjka305piconajcloufj5i3l0!nd_dft_wgth_jpg_3.JPEG'},
+  discipline:{l:'/static/img/1040g0k0325kb9lsjka405piconajclou86f1ld0!nd_dft_wgth_jpg_3.JPEG'},
+  plan:{l:'/static/img/1040g0k0325kb9lsjka405piconajclou86f1ld0!nd_dft_wgth_jpg_3.JPEG'},
+};
+const BG_DARK='/static/img/59092a86037e1422bdba42ae3ce2e16b.jpg';
+function applyBg(){
+  const dark=document.body.getAttribute('data-theme')==='dark';
+  const src=dark?BG_DARK:((BGS[view]||BGS.explore).l);
+  document.getElementById('bg').style.backgroundImage="url('"+src+"')";
+}
+
+async function api(path,body){
+  const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:body!==undefined?JSON.stringify(body):undefined});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok){throw new Error(d.error||('HTTP '+r.status))}
+  return d;
+}
+async function apiGet(path){
+  const r=await fetch(path);
+  if(!r.ok)throw new Error(r.status);
+  return r.json();
+}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtMd(t){return esc(t)
+  .replace(/^### (.*)$/gm,'<h3>$1</h3>').replace(/^## (.*)$/gm,'<h2>$1</h2>').replace(/^# (.*)$/gm,'<h1>$1</h1>')
+  .replace(/\|(.+)\|/g,m=>{const c=m.slice(1,-1).split('|').map(x=>x.trim());return '<td>'+c.join('</td><td>')+'</td>';})
+  .replace(/^\*\*?(.+?)\*\*?/gm,'<b>$1</b>');}
+function setTheme(v){const b=document.body;
+  if(v==='light')b.removeAttribute('data-theme');
+  else b.setAttribute('data-theme',v);
+  try{localStorage.setItem('growlab-theme',v)}catch(e){}
+  applyBg();}
+(function(){try{const t=localStorage.getItem('growlab-theme');
+  if(t){setTheme(t);const s=document.getElementById('themeSel');if(s)s.value=t;}}catch(e){}})();
+
+// ---------- 初始化 / 用户 ----------
+async function init(){
+  await reloadUsers();
+  applyBg();
+  renderAll();
+  initScroll();
+}
+async function reloadUsers(){
+  users=await apiGet('/api/users');
+  if(!users.find(u=>u.id===cur))cur=users.length?users[0].id:null;
+  document.getElementById('userTags').innerHTML=users.map(u=>
+    `<span class="usertag ${u.id===cur?'on':''}" onclick="selectUser(${u.id})">${esc(u.name)}</span>`).join('')
+    + (users.length?'':'<span class="muted">（还没有学习者，先添加一个）</span>');
+}
+function selectUser(id){cur=id;document.querySelectorAll('.usertag').forEach((t,i)=>
+  t.classList.toggle('on',users[i].id===id));renderAll();}
+function showAddUser(){
+  const name=prompt('学习者姓名：');
+  if(!name)return;
+  const cat=prompt('类型（balance=学业健康 / swim=运动 / think=想法 / self=本人）：','balance');
+  api('/api/users',{name,category:cat||'balance'}).then(()=>{reloadUsers();renderAll();});
+}
+function secBody(v){return document.querySelector('#sec-'+v+' .sec-body');}
+function renderAll(){
+  if(!cur){
+    document.querySelectorAll('.sec-body').forEach(el=>el.innerHTML='');
+    const b=secBody('plan'); if(b)b.innerHTML='<div class="card"><div class="muted">先在上方添加一位学习者，再开始。</div></div>';
+    return;
+  }
+  renderPlan(); renderTheater(); renderDiscipline(); renderExplore();
+  renderLab(); renderMemory(); renderPet(); renderCards();
+}
+function showView(v){
+  const sec=document.getElementById('sec-'+v);
+  if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function initScroll(){
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});},{rootMargin:'0px 0px -10% 0px',threshold:0.05});
+    document.querySelectorAll('#main .sec').forEach(s=>io.observe(s));
+  }else{
+    document.querySelectorAll('#main .sec').forEach(s=>s.classList.add('in'));
+  }
+  window.addEventListener('scroll',onScrollSpy,{passive:true});
+  onScrollSpy();
+}
+function onScrollSpy(){
+  let curSec='plan';
+  const y=window.scrollY + window.innerHeight*0.3;
+  document.querySelectorAll('#main .sec').forEach(s=>{ if(s.offsetTop<=y) curSec=s.dataset.view; });
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.view===curSec));
+}
+
+// ---------- 探索空间 ----------
+function renderExplore(){
+  const h=`<div class="specimen">
+    <div class="spec-kicker">EXPLORATION · 标本 001</div>
+    <h2>探索空间</h2>
+    <div class="spec-sub">别急着定目标。写下你的模糊感受，Agent 帮你转成「可以试一试的方向」——所有推断都是可编辑的假设，不是定论。</div>
+    <hr class="spec-rule">
+    <div class="spec-label">
+      <span class="spec-no">标本 · 输入</span>
+      <textarea id="ex_feeling" placeholder="例：最近很迷茫，不知道该把时间花在什么上"></textarea>
+    </div>
+    <div class="row" style="margin-top:10px"><button class="act primary" onclick="doExplore()">探索方向</button></div>
+    <div id="ex_result" style="margin-top:14px"></div>
+  </div>`;
+  secBody('explore').innerHTML=h;
+}
+async function doExplore(){
+  const f=document.getElementById('ex_feeling').value.trim();
+  if(!f)return alert('写点感受');
+  document.getElementById('ex_result').innerHTML='<div class="muted">探索中…</div>';
+  const r=await api('/api/explore',{user_id:cur,feeling:f});
+  lastDirections=r.directions||[];
+  let h='';
+  if(lastDirections.length){
+    h+=`<div class="spec-grid">`;
+    lastDirections.forEach((d,i)=>{
+      h+=`<div class="spec-card">
+        <div class="no">方向 ${String(i+1).padStart(2,'0')}</div>
+        <div class="nm">${esc(d.name)}</div>
+        <div class="why">${esc(d.why||'')}</div>
+        <div class="rule"></div>
+        <div class="row" style="gap:6px">
+          <span class="badge ok" style="flex:0 0 auto">${esc(d.cost||'')}</span>
+          <button class="act narrow" onclick="takeToPractice(${i})">🎭 带去练习</button>
+        </div>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+  if(r.first_experiment){
+    h+=`<div class="spec-card first" style="margin-top:12px">
+      <div class="no">★ 建议先试</div>
+      <div class="nm">${esc(r.first_experiment)}</div>
+    </div>`;
+  }
+  if(r.note)h+=`<div class="muted" style="margin-top:8px">${esc(r.note)}</div>`;
+  document.getElementById('ex_result').innerHTML=h;
+}
+function takeToPractice(i){
+  const d=lastDirections[i]||{};
+  openHandoff({
+    kind:'explore',
+    title:d.name||'练习方向',
+    summary:`想练的方向：${d.name||''}。为什么：${d.why||''}`,
+    source_ref:'explore',
+    onConfirm:(title,summary)=>{
+      api('/api/events',{user_id:cur,kind:'explore',title,summary,source_ref:'explore',status:'confirmed'});
+      pendingSummary=summary;
+      showView('theater');
+    },
+    onSkip:()=>{pendingSummary='';showView('theater');}
+  });
+}
+
+// ---------- 情境剧场 ----------
+async function renderTheater(){
+  if(curScene&&curRun){return renderScenePlay();}
+  let h=`<div class="card">
+    <div class="section-t">情境剧场 · 在场景里练，而不是只听建议</div>
+    <div class="muted" style="margin-bottom:8px">选一个关系/健康情境。遇到关键节点可以「重演」——换一种说法，看结果怎么变。角色反应只是模拟，不代表真人。</div>`;
+  if(pendingSummary){
+    h+=`<div class="handoff-banner">🎯 你带来的练习目标：${esc(pendingSummary)}</div>`;
+  }
+  h+=`<div class="row" style="margin-bottom:10px">
+      <button class="act primary" onclick="showCreateScene()">＋ 自创一个场景</button>
+    </div>`;
+  try{
+    const scenes=await apiGet('/api/scenarios');
+    scenes.forEach(s=>{
+      const isCustom=(s.slug||'').startsWith('custom-');
+      const del=isCustom?`<span class="badge no" onclick="event.stopPropagation();delScene('${esc(s.slug)}')">删除</span>`:'';
+      h+=`<div class="scene" onclick="openDirector('${esc(s.slug)}')">
+      <div class="avatar">${esc(s.avatar||'🧑')}</div>
+      <div class="grow"><div class="t">${esc(s.title)}</div>
+      <div class="m">${esc(s.theme)} · ${esc(s.goal)}</div></div>
+      ${del}<span class="badge ok">进入</span></div>`;
+    });
+  }catch(e){h+=`<div class="muted">场景加载失败：${esc(e.message)}</div>`;}
+  h+=`</div>`;
+  secBody('theater').innerHTML=h;
+}
+async function openDirector(slug){
+  const sc=await apiGet('/api/scenarios/'+slug);
+  directorSetup={slug:slug, focus:'清楚表达', intensity:'普通', feedback:'结束后再看'};
+  let h=`<div class="card"><div class="section-t">导演设置 · ${esc(sc.title)}</div>
+    <div class="muted" style="margin-bottom:4px">这次更想练什么？评估会按你的训练意图来，而不是永远追「让对方满意」。</div>
+    <label class="dir-lbl">训练目标</label><div class="dir-row" id="dir_focus"></div>
+    <label class="dir-lbl">挑战强度</label><div class="dir-row" id="dir_intensity"></div>
+    <label class="dir-lbl">反馈时机</label><div class="dir-row" id="dir_feedback"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="act primary" onclick="startWithDirector()">开始练习</button>
+      <button class="act" onclick="renderTheater()">← 返回</button>
+    </div></div>`;
+  secBody('theater').innerHTML=h;
+  renderDirOpts('dir_focus',['清楚表达','守住边界','理解分歧','提出请求'],'focus');
+  renderDirOpts('dir_intensity',['轻松','普通','有压力'],'intensity');
+  renderDirOpts('dir_feedback',['过程中提示','结束后再看'],'feedback');
+}
+function renderDirOpts(id,opts,key){
+  document.getElementById(id).innerHTML=opts.map(o=>
+    `<span class="dir-opt ${directorSetup[key]===o?'on':''}" onclick="setDir('${key}','${o}')">${o}</span>`).join('');
+}
+function setDir(key,val){
+  directorSetup[key]=val;
+  const opts={focus:['清楚表达','守住边界','理解分歧','提出请求'],
+    intensity:['轻松','普通','有压力'],feedback:['过程中提示','结束后再看']};
+  renderDirOpts({focus:'dir_focus',intensity:'dir_intensity',feedback:'dir_feedback'}[key],opts[key],key);
+}
+async function startWithDirector(){
+  const d={focus:directorSetup.focus,intensity:directorSetup.intensity,feedback:directorSetup.feedback};
+  const slug=directorSetup.slug;directorSetup=null;
+  await startScene(slug,d);
+}
+async function delScene(slug){
+  if(!confirm('删除这个自创场景？'))return;
+  const r=await api('/api/scenes/'+slug+'/delete',{});
+  if(r.error)return alert(r.error);
+  renderTheater();
+}
+function showCreateScene(){
+  secBody('theater').innerHTML=`<div class="card">
+    <div class="section-t">自创一个情境</div>
+    <div class="muted" style="margin-bottom:8px">填几句，AI 帮你把对方的角色、开场和关键节点设计成可练的对话。</div>
+    <label>场景标题</label><input id="cs_title" placeholder="如：跟导师请假延期交作业">
+    <label>背景 / 发生了什么</label><textarea id="cs_bg" placeholder="如：作业写不完了，想跟导师申请延期两天">${pendingSummary?esc(pendingSummary):''}</textarea>
+    <label>对方是谁（名字+性格，可留空让 AI 设计）</label><input id="cs_char" placeholder="如：严格但通情达理的导师">
+    <label>你的目标</label><input id="cs_goal" placeholder="如：争取延期两天，又不显得偷懒">
+    <label>约束（分号分隔，可留空）</label><input id="cs_cons" placeholder="如：不能撒谎；不能甩锅给他人">
+    <div class="row" style="margin-top:12px">
+      <button class="act primary" onclick="createScene()">生成场景</button>
+      <button class="act" onclick="renderTheater()">← 返回</button>
+    </div>
+  </div>`;
+}
+async function createScene(){
+  const title=document.getElementById('cs_title').value.trim();
+  const background=document.getElementById('cs_bg').value.trim();
+  const goal=document.getElementById('cs_goal').value.trim();
+  if(!title||!background||!goal)return alert('标题、背景、目标都要填');
+  document.querySelector('#main .act.primary').textContent='生成中…';
+  const r=await api('/api/scenes/custom',{user_id:cur,title,background,
+    character:document.getElementById('cs_char').value.trim(),
+    goal,constraints:document.getElementById('cs_cons').value.trim()});
+  if(r.error)return alert(r.error);
+  pendingSummary='';
+  await startScene(r.slug);
+}
+async function startScene(slug,director){
+  const r=await api(`/api/scenes/${slug}/start`,{user_id:cur,director:director||null});
+  curScene=r.scenario;curRun={id:r.run_id,branch:'A',node:r.current_node_id,tl:[],director:r.director||{}};
+  renderScenePlay();
+}
+function renderScenePlay(){
+  const s=curScene;
+  const node=s.key_nodes.find(n=>n.node_id===curRun.node)||s.key_nodes[0];
+  let chat=curRun.tl.map(t=>{
+    const isUser=t.who==='user';
+    return `<div class="msg ${isUser?'user':''}">
+      <div class="avatar">${isUser?'🎓':esc(s.avatar||'🧑')}</div>
+      <div class="bubble ${isUser?'user':'char'}"><span class="who">${isUser?'你':esc(s.character_name)}</span>${esc(t.text)}</div>
+    </div>`;
+  }).join('');
+  const done=curRun.node==='';
+  let h=`<div class="card">
+    <div class="section-t">${esc(s.title)} · 分支 ${esc(curRun.branch)}</div>
+    <div class="muted" style="margin-bottom:6px">${esc(s.background)}</div>
+    <div class="muted"><b>你的目标：</b>${esc(s.goal)}</div>
+    <div class="muted"><b>约束：</b>${esc((s.constraints||[]).join('；'))}</div>
+    ${curRun.director&&curRun.director.focus?`<div class="muted"><b>训练设置：</b>${esc(curRun.director.focus)} · ${esc(curRun.director.intensity)} · ${esc(curRun.director.feedback)}</div>`:''}
+    <div class="chat">${chat||'<div class="muted">场景开始…</div>'}</div>
+    <div id="evalBox" class="eval"></div>`;
+  if(done){
+    h+=`<div class="md"><b>本分支已结束。</b>可以「重演」换一种策略，或对比两个分支。</div>
+      <div class="row" style="margin-top:8px">
+        <button class="act" onclick="replayScene()">↻ 重演（新分支）</button>
+        <button class="act primary" onclick="compareScene()">⚖ 对比分支</button>
+        <button class="act" onclick="backToScenes()">← 返回场景列表</button>
+      </div>`;
+  }else{
+    h+=`<div class="msg"><div class="avatar">${esc(s.avatar||'🧑')}</div><div class="bubble char"><span class="who">${esc(s.character_name)}</span>${esc(node.prompt)}</div></div>
+      <textarea id="sc_text" placeholder="你在这说…"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="act primary" onclick="advanceScene()">说</button>
+        <button class="act" onclick="replayScene()">↻ 重演</button>
+        <button class="act" onclick="backToScenes()">← 退出</button>
+      </div>`;
+  }
+  h+=`<div id="cmpBox" style="margin-top:10px"></div></div>`;
+  secBody('theater').innerHTML=h;
+  const fb=(curRun.director||{}).feedback;
+  if(done && fb==='结束后再看' && (curRun.evals||[]).length){
+    const eb=document.getElementById('evalBox');
+    if(eb) eb.innerHTML=`<div class="muted" style="flex-basis:100%">本场评估 · 训练目标：${esc((curRun.director||{}).focus||'')}</div>`
+      +curRun.evals.map(evalBadgeHTML).join('');
+  }
+}
+function evalBadgeHTML(ev){
+  if(!ev)return '';
+  let h=`<span class="badge ${ev['达成目标']?'ok':'no'}">达成目标：${ev['达成目标']?'✓':'✗'}</span>
+    <span class="badge ${ev['关系友好']?'ok':'no'}">关系友好：${ev['关系友好']?'✓':'✗'}</span>
+    <span class="badge ${ev['真诚表达']?'ok':'no'}">真诚表达：${ev['真诚表达']?'✓':'✗'}</span>`;
+  if(ev.comment)h+=`<span class="muted" style="flex-basis:100%">${esc(ev.comment)}</span>`;
+  return h;
+}
+async function advanceScene(){
+  const t=document.getElementById('sc_text').value.trim();
+  if(!t)return alert('先输入你的回应');
+  let r;
+  try{ r=await api(`/api/scenes/run/${curRun.id}/advance`,{text:t}); }
+  catch(e){ alert('发送失败：'+e.message); return; }
+  curRun.tl.push({who:'user',text:t});
+  if(r.red_flag){curRun.tl.push({who:'char',text:r.message});renderScenePlay();return;}
+  curRun.tl.push({who:'char',text:r.character_reply});
+  curRun.node=r.next_node_id||'';
+  curRun.evals=curRun.evals||[];
+  if(r.eval&&Object.keys(r.eval).length)curRun.evals.push(r.eval);
+  renderScenePlay();
+  const immediate=((curRun.director||{}).feedback||'结束后再看')==='过程中提示';
+  if(immediate&&r.eval&&Object.keys(r.eval).length){
+    document.getElementById('evalBox').innerHTML=evalBadgeHTML(r.eval);
+  }
+}
+async function replayScene(){
+  const r=await api(`/api/scenes/run/${curRun.id}/replay`);
+  curRun={id:r.run_id,branch:r.branch_label,node:r.current_node_id,tl:[],director:r.director||(curRun&&curRun.director)||{},evals:[]};
+  renderScenePlay();
+}
+async function compareScene(){
+  document.getElementById('cmpBox').innerHTML='<div class="muted">对比中…</div>';
+  let r;
+  try{ r=await api(`/api/scenes/${curScene.slug}/compare`,{user_id:cur}); }
+  catch(e){ document.getElementById('cmpBox').innerHTML=`<div class="muted">对比失败：${esc(e.message)}</div>`; return; }
+  if(r.error){document.getElementById('cmpBox').innerHTML=`<div class="muted">${esc(r.error)}</div>`;return;}
+  lastCompare=r.compare;
+  document.getElementById('cmpBox').innerHTML=`<div class="md">${fmtMd(r.compare)}</div>
+    <div class="row" style="margin-top:8px">
+      <button class="act primary" onclick="makeExperiment()">🧪 变成现实小实验</button>
+      <button class="act" onclick="collectExperience()">🃏 收藏经验</button>
+    </div>`;
+}
+async function makeExperiment(){
+  const r=await api(`/api/scenes/${curScene.slug}/experiment-plan`,{user_id:cur,compare_text:lastCompare});
+  const title=r.hypothesis||('实验：'+curScene.title);
+  const summary=[r.hypothesis,r.action].filter(Boolean).join('；')||lastCompare.slice(0,140);
+  openHandoff({
+    kind:'experiment', title:title, summary:summary,
+    source_ref:'theater:'+curScene.title,
+    onConfirm:(t,s)=>{
+      api('/api/experiments',{user_id:cur,source_scene:curScene.title,
+        hypothesis:t,action:s,record_what:r.record_what||'',review_date:r.review_date||''});
+      api('/api/events',{user_id:cur,kind:'experiment',title:t,summary:s,source_ref:'theater:'+curScene.title,status:'confirmed'});
+      backToScenes();showView('lab');
+    },
+    onSkip:()=>{backToScenes();}
+  });
+}
+function collectExperience(){
+  openHandoff({
+    kind:'experience',
+    title:'经验：'+curScene.title,
+    summary:lastCompare.slice(0,160),
+    source_ref:'theater:'+curScene.title,
+    onConfirm:(t,s)=>{
+      api('/api/experience-cards',{user_id:cur,conclusion:s,situation:curScene.title,limitation:'',source_ref:'theater:'+curScene.title});
+      api('/api/events',{user_id:cur,kind:'experience',title:t,summary:s,source_ref:'theater:'+curScene.title,status:'confirmed'});
+      alert('已收藏到经验卡');
+    },
+    onSkip:()=>{}
+  });
+}
+function backToScenes(){curScene=null;curRun=null;renderTheater();}
+
+// ---------- 规划（文字驱动 · 学业与身心平衡） ----------
+function fmtDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function todayISO(){return fmtDate(new Date());}
+
+async function renderPlan(){
+  const h=`<div class="card">
+    <div class="section-t">规划 · 学业与身心平衡</div>
+    <div class="muted" style="margin-bottom:8px">一句话说今天的安排或状态，AI 拆成可确认的操作。确认前不写入，写入了也能撤销。</div>
+    <div class="plan-input">
+      <textarea id="plan_text" placeholder="例：明天早上背单词，晚上跑步 40 分钟，11 点前睡，今天有点累"></textarea>
+      <button class="act primary" onclick="doParse()">解析 →</button>
+    </div>
+    <div id="plan_status"></div>
+    <div id="plan_ops"></div>
+    <div class="section-t" style="margin-top:16px">今日日程</div>
+    <div id="plan_schedule" class="muted">加载中…</div>
+    <div class="section-t" style="margin-top:16px">身心状态 · 睡眠 / 精力 / 专注 / 压力</div>
+    <div id="plan_metrics" class="muted">加载中…</div>
+  </div>`;
+  secBody('plan').innerHTML=h;
+  refreshSchedule(); refreshMetrics();
+}
+
+async function doParse(){
+  const t=document.getElementById('plan_text').value.trim();
+  if(!t)return alert('先写一句');
+  const st=document.getElementById('plan_status');
+  st.innerHTML='<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="loading-txt">正在理解你的话…</span></div>';
+  document.getElementById('plan_ops').innerHTML='';
+  let r;
+  try{ r=await api(`/api/users/${cur}/parse-intent`,{text:t}); }
+  catch(e){ st.innerHTML=`<div class="muted">解析失败：${esc(e.message)}</div>`; return; }
+  st.innerHTML='';
+  if(r.parse_error){ document.getElementById('plan_ops').innerHTML='<div class="muted">没解析出来，试试换种说法。</div>'; return; }
+  if(r.ambiguous){ st.innerHTML=`<div class="muted">⚠️ ${esc(r.ambiguous)}</div>`; }
+  renderOps(r.ops||[]);
+}
+
+function renderOps(ops){
+  const el=document.getElementById('plan_ops');
+  if(!ops.length){ el.innerHTML='<div class="muted">没识别到操作，试试更具体一点。</div>'; return; }
+  el.innerHTML=ops.map((o,i)=>opCardHTML(o,i)).join('');
+}
+
+function opCardHTML(o,i){
+  const b={add:['新增','ok'],modify:['修改','warn'],cancel:['取消','no'],complete:['完成','ok'],status:['状态','info']}[o.intent]||['?',''];
+  const mt=(o.metrics||[]).map(m=>`${m.dimension} ${m.value??'?'}`).join(' · ');
+  const tt=o.start_time?`${o.date} ${o.start_time}${o.end_time?'-'+o.end_time:''}`:(o.date||'');
+  return `<div class="op-card" id="op-${o.pending_op_id}" style="animation-delay:${i*60}ms">
+    <div class="op-head"><span class="op-badge ${b[1]}">${b[0]}</span><span class="op-title">${esc(o.goal_title||'(未命名)')}</span></div>
+    <div class="op-meta">${esc(tt)}${mt?' · '+esc(mt):''}</div>
+    ${o.note?`<div class="op-note">${esc(o.note)}</div>`:''}
+    ${o.ask?`<div class="op-ask">🤔 ${esc(o.ask)}</div>`:''}
+    <div class="op-acts"><button class="act primary" onclick="confirmOp(${o.pending_op_id})">确认写入</button><button class="act" onclick="cancelOp(${o.pending_op_id})">取消</button></div>
+    <div class="op-result" id="op-res-${o.pending_op_id}"></div>
+  </div>`;
+}
+
+async function confirmOp(oid){
+  const card=document.getElementById('op-'+oid), res=document.getElementById('op-res-'+oid);
+  res.innerHTML='<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+  let r;
+  try{ r=await api(`/api/ops/${oid}/confirm`,{}); }
+  catch(e){ res.innerHTML=`<div class="muted">写入失败：${esc(e.message)}</div>`; card.classList.add('op-err'); return; }
+  if(r.error){ res.innerHTML=`<div class="muted">${esc(r.error)}</div>`; card.classList.add('op-err'); return; }
+  card.classList.add('op-done');
+  let extra='<span class="op-done-txt">✓ 已写入</span>';
+  if(r.conflicts&&r.conflicts.length){ extra+=conflictHTML(r.conflicts); extra+=`<button class="act" onclick="adjustOp(${oid})">让 AI 重排</button>`; }
+  else if(r.capacity){ extra+=`<div class="conflict">⚠️ 超容量：已排 ${r.capacity.scheduled} 分钟 / 可用 ${r.capacity.available} 分钟</div><button class="act" onclick="adjustOp(${oid})">让 AI 重排</button>`; }
+  res.innerHTML=extra;
+  refreshSchedule(); refreshMetrics(); loadDiscipline();
+}
+
+async function cancelOp(oid){
+  const card=document.getElementById('op-'+oid);
+  try{ await api(`/api/ops/${oid}/cancel`,{}); }catch(e){ return alert('取消失败：'+e.message); }
+  card.classList.add('op-done','op-cancelled');
+  card.querySelector('.op-acts').innerHTML='<span class="muted">已取消</span>';
+}
+
+function conflictHTML(cs){
+  return cs.map(c=>`<div class="conflict">${c.type==='rest'?'💤 撞休息时段':'⚠️ 撞日程'}：${esc(c.label||c.title||'')} ${esc(c.start||'')}${c.end?'-'+esc(c.end):''}</div>`).join('');
+}
+
+async function adjustOp(oid){
+  const res=document.getElementById('op-res-'+oid);
+  res.innerHTML='<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="loading-txt">AI 在想怎么调…</span></div>';
+  let r;
+  try{ r=await api(`/api/ops/${oid}/adjust`,{}); }
+  catch(e){ res.innerHTML=`<div class="muted">调整失败：${esc(e.message)}</div>`; return; }
+  if(!r.candidates||!r.candidates.length){ res.innerHTML='<div class="muted">AI 没给候选，你手动改吧。</div>'; return; }
+  res.innerHTML=r.candidates.map(c=>`<div class="adj-cand">🕐 ${esc(c.start_time)}-${esc(c.end_time)} · ${esc(c.reason)}</div>`).join('')+(r.note?`<div class="muted" style="margin-top:4px">${esc(r.note)}</div>`:'');
+}
+
+async function refreshSchedule(){
+  const el=document.getElementById('plan_schedule'); if(!el)return;
+  let s=[];
+  try{ s=await apiGet(`/api/users/${cur}/schedule`); }catch(e){ el.innerHTML='<div class="muted">日程加载失败</div>'; return; }
+  const days=[]; for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()+i);days.push(fmtDate(d));}
+  const by={}; days.forEach(d=>by[d]=[]);
+  s.forEach(it=>{ if(by[it.date]!==undefined) by[it.date].push(it); });
+  const labelOf=d=>{ if(d===days[0])return '今天'; if(d===days[1])return '明天'; return d.slice(5).replace('-','/'); };
+  const html=days.map(d=>{
+    const items=by[d]; if(!items.length)return '';
+    const rows=items.map((it,i)=>`<div class="sched-item ${it.status==='cancelled'?'cancelled':''}" style="animation-delay:${i*50}ms"><span class="sched-time">${esc(it.start_time||'—')}${it.end_time?'-'+esc(it.end_time):''}</span><span class="sched-title">${esc(it.title)}</span></div>`).join('');
+    return `<div class="sched-day-h">${labelOf(d)}</div>${rows}`;
+  }).join('');
+  el.innerHTML=html||'<div class="muted">未来 7 天还没排。</div>';
+}
+
+async function refreshMetrics(){
+  const el=document.getElementById('plan_metrics'); if(!el)return;
+  let m=[];
+  try{ m=await apiGet(`/api/users/${cur}/metrics?date=${todayISO()}`); }catch(e){ el.innerHTML='<div class="muted">记录加载失败</div>'; return; }
+  const dims=[['sleep','睡眠'],['energy','精力'],['focus','专注'],['stress','压力']];
+  if(!m.length){ el.innerHTML='<div class="muted">今天还没记录状态。</div>'; return; }
+  el.innerHTML='<div class="metric-grid">'+dims.map(([d,n])=>{const v=[...m].reverse().find(x=>x.dimension===d);return `<div class="metric-cell ${v?'has':''}"><div class="m-n">${n}</div><div class="m-v">${v?(v.value??'?'):'—'}</div></div>`;}).join('')+'</div>';
+}
+
+// ---------- 个人实验室 ----------
+async function renderLab(){
+  let h=`<div class="card"><div class="section-t">个人实验室 · 把启发变成真实行动</div>
+    <div class="muted">讨论/模拟的收获，转成一个小实验：验证什么、做什么、记录什么、何时回看。不完成也不惩罚。</div>
+    <div class="section-t" style="margin-top:12px">开一个实验</div>
+    <input id="exp_hypo" placeholder="想验证什么（如：健身后1小时做题更专注）">
+    <div class="row" style="margin-top:8px">
+      <input id="exp_action" placeholder="做什么（一个24h内可做的动作）">
+      <button class="act narrow primary" onclick="createExp()">开实验</button>
+    </div></div>`;
+  const exps=await apiGet('/api/experiments?user_id='+cur);
+  h+=`<div class="card"><div class="section-t">我的实验（${exps.length}）</div>`;
+  if(!exps.length)h+=`<div class="muted">还没有实验。去「情境剧场」打完一场，点「变成现实小实验」。</div>`;
+  exps.forEach(e=>{
+    h+=`<div class="list-item"><div class="grow">
+      <b>${esc(e.hypothesis||'(无假设)')}</b>
+      <div class="muted">动作：${esc(e.action||'')}</div>
+      <div class="muted">记录：${esc(e.record_what||'')} · 回看 ${esc(e.review_date||'未定')} · 状态 ${e.status==='done'?'✅已完成':'⏳进行中'}</div>`;
+    if(e.status!=='done'){
+      h+=`<div class="row" style="margin-top:6px"><textarea id="out_${e.id}" placeholder="回访：实际发生了什么？" style="min-height:40px"></textarea>
+        <button class="act narrow" onclick="reviewExp(${e.id})">回访复盘</button></div>`;
+    }else if(e.expected_vs_actual||e.outcome){
+      h+=`<div class="muted">回访：${esc(e.outcome||'')}</div>`;
+    }
+    h+=`</div><div id="rev_${e.id}"></div></div>`;
+  });
+  h+=`</div>`;
+  secBody('lab').innerHTML=h;
+}
+async function reviewExp(eid){
+  const o=document.getElementById('out_'+eid).value.trim();
+  if(!o)return alert('写点回访');
+  const r=await api(`/api/experiments/${eid}/review`,{outcome:o});
+  document.getElementById('rev_'+eid).innerHTML=`<div class="md" style="margin-top:6px">${fmtMd(r.review)}</div>`;
+  setTimeout(renderLab,500);
+}
+async function createExp(){
+  const hypothesis=document.getElementById('exp_hypo').value.trim();
+  const action=document.getElementById('exp_action').value.trim();
+  if(!hypothesis&&!action)return alert('写点想验证的');
+  await api('/api/experiments',{user_id:cur,source_scene:'手动',
+    hypothesis:action?hypothesis:action,action:action||hypothesis,
+    record_what:'',review_date:''});
+  renderLab();
+}
+
+// ---------- 成长档案 ----------
+async function renderMemory(){
+  const ms=await apiGet('/api/memory?user_id='+cur);
+  const events=await apiGet('/api/users/'+cur+'/events');
+  const drafts=events.filter(e=>e.status==='draft');
+  let h=`<div class="card"><div class="section-t">成长档案 · 积累证据，不贴标签</div>
+    <div class="muted">这里记录可编辑的记忆：偏好、假设、经历。你可以查看、纠正、删除；不生成虚假分数。</div>
+    <div class="row" style="margin-top:10px">
+      <input id="mm_content" placeholder="记一条（如：我发现用「说感受+给替代方案」拒绝更不伤感情）">
+      <button class="act narrow primary" onclick="addMemory()">记下</button>
+    </div></div>`;
+  h+=`<div class="card"><div class="section-t">待续事件（${drafts.length}）</div>`;
+  if(!drafts.length)h+=`<div class="muted">没有暂停的交接。</div>`;
+  drafts.forEach(e=>{
+    h+=`<div class="list-item"><div class="grow"><b>${esc(e.title||e.kind)}</b>
+      <div class="muted">${esc(e.summary||'')}</div></div>
+      <button class="act narrow" onclick="resumeEvent(${e.id})">继续</button>
+      <button class="act narrow danger" onclick="delEvent(${e.id})">删除</button></div>`;
+  });
+  h+=`</div>`;
+  h+=`<div class="card"><div class="section-t">已有记录（${ms.length}）</div>`;
+  if(!ms.length)h+=`<div class="muted">还没有记录。</div>`;
+  ms.forEach(m=>{
+    h+=`<div class="list-item"><div class="grow"><b>${esc(m.kind)}</b>
+      <div>${esc(m.content)}</div>
+      ${m.source_ref?`<div class="muted">出处：${esc(m.source_ref)}</div>`:''}</div>
+      <button class="act narrow" onclick="editMemory(${m.id})">编辑</button>
+      <button class="act narrow danger" onclick="delMemory(${m.id})">删除</button></div>`;
+  });
+  h+=`</div>`;
+  secBody('memory').innerHTML=h;
+}
+function addMemory(){
+  const c=document.getElementById('mm_content').value.trim();
+  if(!c)return alert('写点内容');
+  api('/api/memory',{user_id:cur,kind:'experience',content:c}).then(()=>renderMemory());
+}
+function editMemory(id){
+  const c=prompt('修改这条记录：');
+  if(c==null)return;
+  api(`/api/memory/${id}/edit`,{content:c}).then(renderMemory);
+}
+function delMemory(id){
+  if(!confirm('删除这条记录？（软删除，可追溯）'))return;
+  api(`/api/memory/${id}/delete`,{}).then(renderMemory);
+}
+async function resumeEvent(eid){
+  const evs=await apiGet('/api/users/'+cur+'/events');
+  const e=evs.find(x=>x.id===eid);
+  if(!e)return;
+  openHandoff({kind:e.kind,title:e.title,summary:e.summary,source_ref:e.source_ref,eventId:eid});
+}
+async function delEvent(eid){
+  if(!confirm('删除这条草稿？'))return;
+  await api('/api/events/'+eid+'/delete',{});
+  renderMemory();
+}
+
+// ---------- 成长宠物 ----------
+async function renderPet(){
+  let h=`<div class="card"><div class="section-t">成长宠物 · 一起上学、吃饭、睡觉</div>
+    <div class="muted" style="margin-bottom:10px">你的学习行动会给它加经验；照顾它的吃和睡，它陪你一起长大。</div>
+    <div id="petBox"><div class="muted">孵化中…</div></div></div>
+  <div class="card"><div class="section-t">萌宠农场 · 自律收菜</div>
+    <div class="muted" style="margin-bottom:6px">打卡解锁种植，成熟收菜喂宠物；偷懒会枯萎、还会被同学偷。</div>
+    <div id="farmBox"><div class="muted">加载中…</div></div></div>
+  <div class="card"><div class="section-t">社区 · 偷菜</div>
+    <div class="muted" style="margin-bottom:6px">本地同学（4 位学习者）的农场，成熟作物可以偷。</div>
+    <div id="commBox"><div class="muted">加载中…</div></div></div>`;
+  secBody('pet').innerHTML=h;
+  await loadPet();
+  await loadFarm();
+  await loadCommunity();
+}
+const CROP_STAGE={seed:'🌱',sprout:'🌿',ripe:'',wilted:'🥀'};
+async function loadFarm(){
+  const f=await apiGet('/api/farms?user_id='+cur);
+  document.getElementById('farmBox').innerHTML=farmHTML(f);
+}
+function farmHTML(f){
+  const plots=f.plots.map((p,i)=>{
+    let icon='',act='',title='';
+    if(p.stage==='empty'){icon='＋';act=`onclick="plantCrop()"`;title='种菜';}
+    else if(p.stage==='ripe'){icon=p.crop;act=`onclick="harvestCrop(${i})"`;title='收菜';}
+    else if(p.stage==='wilted'){icon='🥀';act=`onclick="harvestCrop(${i})"`;title='清理枯萎';}
+    else{icon=CROP_STAGE[p.stage];title='生长中…';}
+    return `<div class="plot ${p.stage}" ${act} title="${title}">${icon}</div>`;
+  }).join('');
+  return `<div class="farm-scene">
+    <span class="house">🏡</span><span class="sun">☀️</span>
+    <div class="farm-grid">${plots}</div>
+    <div class="fence"></div>
+  </div>
+  <div class="muted" style="margin-top:6px">累计收成 <b style="color:var(--rust)">${f.harvest}</b> · 点空地种菜，点成熟作物收菜</div>`;
+}
+async function plantCrop(){
+  const r=await api('/api/farms/plant',{user_id:cur});
+  if(r.error){alert(r.error);return;}
+  document.getElementById('farmBox').innerHTML=farmHTML(r);
+  loadCommunity();
+}
+async function harvestCrop(i){
+  const r=await api('/api/farms/harvest',{user_id:cur,plot_index:i});
+  if(r.error){alert(r.error);return;}
+  document.getElementById('farmBox').innerHTML=farmHTML(r);
+  loadPet();loadCommunity();
+}
+async function loadCommunity(){
+  const list=await apiGet('/api/farms/community');
+  document.getElementById('commBox').innerHTML=list.map(f=>{
+    const isMe=f.user_id===cur;
+    const ripe=f.plots.map((p,i)=>p.stage==='ripe'
+      ?`<span class="crop-tag" onclick="stealCrop(${f.user_id},${i})" title="偷菜">${p.crop}</span>`:'').join('');
+    return `<div class="comm-row"><div class="grow"><b>${esc(f.name)}${isMe?'（我）':''}</b>
+      <div class="muted">收成 ${f.harvest} · 成熟 ${f.ripe_count}</div></div>
+      <div>${ripe||'<span class="muted">暂无</span>'}</div></div>`;
+  }).join('');
+}
+async function stealCrop(victim,i){
+  const r=await api('/api/farms/steal',{victim_user_id:victim,plot_index:i,thief_user_id:cur});
+  if(r.error){alert(r.error);return;}
+  alert('偷到 '+r.stolen+'！');
+  loadCommunity();loadFarm();
+}
+async function loadPet(){
+  const p=await apiGet('/api/users/'+cur+'/pet');
+  document.getElementById('petBox').innerHTML=petHTML(p);
+}
+function petHTML(p){
+  const bar=(label,val,color)=>`<div class="pbar"><span class="plbl">${label}</span>
+    <span class="ptrack"><span class="pfill" style="width:${Math.max(0,Math.min(100,val))}%;background:${color}"></span></span>
+    <span class="pnum">${val}</span></div>`;
+  const kindIcon={study:'📖',feed:'🍎',sleep:'😴',play:'🎾',explore:'🧭',lab:'🧪',note:'📝'};
+  let events=(p.events||[]).map(e=>`<div class="pet-ev"><span>${kindIcon[e.kind]||'✨'}</span>
+    <span>${esc(e.note)}</span>${e.exp?`<span class="pet-exp">+${e.exp}</span>`:''}</div>`).join('');
+  return `<div class="pet-head">
+      <div class="pet-emoji">${esc(p.species)}</div>
+      <div class="pet-info">
+        <div class="pet-name">${esc(p.name)}<span class="pet-stage">${esc(p.stage)} · Lv.${p.level}</span></div>
+        <div class="muted">${esc(p.status_text)}</div>
+        <div class="pet-expbar"><span class="pfill" style="width:${Math.min(100,100-p.exp_to_next)}%"></span></div>
+        <div class="muted" style="margin-top:2px">距离升级还差 ${p.exp_to_next} 经验</div>
+      </div>
+    </div>
+    ${bar('饱食',p.satiety,'#C89B5A')}
+    ${bar('精力',p.energy,'#8FAE84')}
+    ${bar('心情',p.mood,'#B0642F')}
+    <div class="row" style="margin-top:12px">
+      <button class="act primary" onclick="petAct('feed')">🍎 喂食</button>
+      <button class="act" onclick="petAct('sleep')">😴 睡觉</button>
+      <button class="act" onclick="petAct('play')">🎾 玩耍</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button class="act" onclick="petRename()">✏️ 起名</button>
+      <button class="act" onclick="petSkin()">🎨 换皮肤</button>
+    </div>
+    <div class="section-t" style="margin-top:16px">萌宠日记</div>
+    ${events||'<div class="muted">还没有记录，先去学习/陪它玩一次吧。</div>'}`;
+}
+async function petAct(a){
+  document.getElementById('petBox').innerHTML='<div class="muted">…</div>';
+  const p=await api('/api/users/'+cur+'/pet/'+a,{});
+  document.getElementById('petBox').innerHTML=petHTML(p);
+}
+function petRename(){
+  const n=prompt('给它起个名字：');
+  if(!n)return;
+  api('/api/users/'+cur+'/pet/update',{name:n})
+    .then(p=>document.getElementById('petBox').innerHTML=petHTML(p));
+}
+function petSkin(){
+  const s=prompt('换个皮肤（输入 emoji，如 🐱🐶🐰🐹🐼🦊）：','🐱');
+  if(!s)return;
+  api('/api/users/'+cur+'/pet/update',{species:s})
+    .then(p=>document.getElementById('petBox').innerHTML=petHTML(p));
+}
+
+// ---------- 成长卡牌 ----------
+async function renderCards(){
+  let h=`<div class="card"><div class="section-t">成长卡牌 · 抽一张，听一句反思</div>
+    <div class="muted" style="margin-bottom:10px">完成真实行动（情境/实验/探索/记录）获得抽卡机会。抽到给一句反思，不是预测。</div>
+    <div id="cardTop"></div>
+    <div id="drawBox"></div>
+    <div id="cardGrid"></div>
+  </div>
+  <div class="card"><div class="section-t">经验卡 · 来自你的真实经历</div>
+    <div class="muted" style="margin-bottom:8px">这些是你认可并收藏的结论，有出处、有边界。AI 不会直接把建议当成你已掌握的经验。</div>
+    <div id="expCards"></div>
+  </div>`;
+  secBody('cards').innerHTML=h;
+  await loadCards();
+  await loadExpCards();
+}
+async function loadExpCards(){
+  const cards=await apiGet('/api/experience-cards?user_id='+cur);
+  const el=document.getElementById('expCards');
+  if(!cards.length){el.innerHTML='<div class="muted">还没有经验卡。去情境剧场/实验室，把认可的经验「收藏」进来。</div>';return;}
+  el.innerHTML=cards.map(c=>`<div class="expcard">
+    <div><b>${esc(c.conclusion)}</b><span class="tag">经验卡</span></div>
+    ${c.situation?`<div class="muted">适用情境：${esc(c.situation)}</div>`:''}
+    ${c.limitation?`<div class="muted">限制：${esc(c.limitation)}</div>`:''}
+    ${c.source_ref?`<div class="muted">来源：${esc(c.source_ref)}</div>`:''}
+    <div class="muted" style="margin-top:2px">「这是我这次认可的尝试，不保证每次有效。」</div>
+    <div class="row" style="margin-top:6px">
+      <button class="act narrow" onclick="editExpCard(${c.id},this)">编辑</button>
+      <button class="act narrow danger" onclick="delExpCard(${c.id})">删除</button>
+    </div></div>`).join('');
+}
+function delExpCard(cid){
+  if(!confirm('删除这张经验卡？'))return;
+  api('/api/experience-cards/'+cid+'/delete',{}).then(loadExpCards);
+}
+function editExpCard(cid,btn){
+  const c=prompt('修改这张经验卡的结论：');
+  if(c==null)return;
+  api('/api/experience-cards/'+cid+'/update',{conclusion:c}).then(loadExpCards);
+}
+async function loadCards(){
+  const r=await apiGet('/api/cards?user_id='+cur);
+  renderCardTop(r); renderCardGrid(r.cards);
+}
+function renderCardTop(r){
+  const n=r.cards.filter(c=>c.collected).length;
+  document.getElementById('cardTop').innerHTML=`
+    <div class="cards-top">
+      <div><span class="draw-big">🎴 ${r.draw_available}</span> <span class="muted">次抽卡机会</span>
+        <div class="muted">已集齐 ${n} / ${r.cards.length} 张</div></div>
+      <button class="act primary" onclick="drawCard()" ${r.draw_available>0?'':'disabled'}>抽一张</button>
+    </div>`;
+}
+function cardFaceHTML(c){
+  return `<div class="cardcell" title="${esc(c.name)}">
+    <img src="${esc(c.img)}" alt="${esc(c.name)}" onerror="this.style.display='none'">
+    <div class="cardcap">${esc(c.name)}</div></div>`;
+}
+function cardBackHTML(){
+  return `<div class="cardcell"><div class="cardback">❦</div></div>`;
+}
+function renderCardGrid(cards){
+  document.getElementById('cardGrid').innerHTML=`<div class="cardgrid">${
+    cards.map(c=>c.collected?cardFaceHTML(c):cardBackHTML()).join('')}</div>`;
+}
+async function drawCard(){
+  document.getElementById('drawBox').innerHTML=`
+    <div class="flip-scene"><div class="flip-inner" id="flipInner">
+      <div class="flip-face flip-back">❦</div>
+      <div class="flip-face flip-front" id="flipFront"></div>
+    </div></div><div class="muted" style="text-align:center">抽卡中…</div>`;
+  const r=await api('/api/cards/draw',{user_id:cur});
+  if(r.error){document.getElementById('drawBox').innerHTML=`<div class="muted">${esc(r.error)}</div>`;return;}
+  const c=r.card;
+  document.getElementById('flipFront').innerHTML=`
+    <img src="${esc(c.img)}" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+    <div style="position:relative;height:100%;padding:12px;display:flex;flex-direction:column;justify-content:flex-end">
+      <div class="cn" style="font-size:15px">${esc(c.name)}</div>
+      <div class="ck">${esc(c.keywords)}</div>
+      <div class="cm" style="margin-top:4px">${esc(c.meaning)}</div>
+    </div>`;
+  setTimeout(()=>{document.getElementById('flipInner').classList.add('flipped');},60);
+  const full=await apiGet('/api/cards?user_id='+cur);
+  renderCardTop({draw_available:full.draw_available,cards:full.cards});
+  renderCardGrid(full.cards);
+}
+
+// ---------- 自律（每日 todo / 打卡） ----------
+let discTimer=null,discSec=0,discRunning=false,discNoteTimer=null;
+async function renderDiscipline(){
+  let h=`<div class="card"><div class="section-t">自律 · 今日待办与打卡</div>
+    <div id="discBox"><div class="muted">加载中…</div></div></div>`;
+  secBody('discipline').innerHTML=h;
+  await loadDiscipline();
+}
+async function loadDiscipline(){
+  const d=await apiGet('/api/users/'+cur+'/discipline');
+  renderDisc(d);
+}
+function renderDisc(d){
+  const t=d.today,s=d.stats;
+  const done=Object.values(t.checkins).filter(v=>v&&Number(v)>0).length;
+  let h=`<div class="disc-stats">
+    <div class="dstat"><div class="dnum">${s.streak}</div><div class="dlbl">连续打卡 🔥</div></div>
+    <div class="dstat"><div class="dnum">${s.checked_days}</div><div class="dlbl">累计打卡日</div></div>
+    <div class="dstat"><div class="dnum">${Math.round(s.total_focus/60*10)/10}h</div><div class="dlbl">累计专注</div></div>
+  </div>`;
+  h+=`<div class="section-t" style="margin-top:14px">今日待办（${done}/${d.goals.length}）</div>
+    <div style="margin:6px 0 8px"><button class="act narrow" onclick="addGoal()">＋ 加待办</button></div>`;
+  if(!d.goals.length)h+=`<div class="muted">还没有目标，去「探索空间」先定一个。</div>`;
+  d.goals.forEach(g=>{
+    const ck=!!(t.checkins[String(g.id)]&&Number(t.checkins[String(g.id)])>0);
+    h+=`<div class="habit ${ck?'checked':''}" onclick="toggleGoal(${g.id},${!ck})">
+      <div class="box">${ck?'✓':''}</div>
+      <div class="grow"><div class="hname">${esc(g.title)}</div>
+        <div class="muted">${g.standard_duration_min?g.standard_duration_min+' 分钟 · ':''}每周 ${g.weekly_frequency} 次</div></div>
+    </div>`;
+  });
+  h+=`<div class="section-t" style="margin-top:16px">专注</div>
+    <div class="muted">今日已专注 <b style="color:var(--rust)">${t.focus_min}</b> 分钟</div>
+    <div id="timerBox"></div>
+    <div class="row" style="margin-top:6px">
+      <button class="act" onclick="discTimerStart()">⏱ 开始专注</button>
+      <button class="act" onclick="discTimerStop(true)">结束记录</button>
+      <input id="focus_add" type="number" min="1" placeholder="手动加分钟" style="max-width:130px">
+      <button class="act narrow" onclick="addFocusMin()">＋</button>
+    </div>`;
+  h+=`<div class="section-t" style="margin-top:16px">今日复盘</div>
+    <textarea id="disc_note" placeholder="今天做得好的、想改进的、明天的计划…" oninput="saveDiscNote(this.value)">${esc(t.note)}</textarea>`;
+  h+=`<div class="section-t" style="margin-top:16px">近 30 天 · 未来规划（虚线=计划日）</div>
+    <div class="heat">${heatHTML(d.history,d.goals.length,d.future)}</div>`;
+  document.getElementById('discBox').innerHTML=h;
+  if(discRunning)renderTimer();
+}
+function heatHTML(hist,total,future){
+  const past=hist.slice(-30).map(h=>{
+    const ratio=total?h.checked/total:0;
+    const cls=ratio>=1?'full':(ratio>0?'part':'');
+    return `<div class="cell ${cls}" title="${esc(h.date)} ${h.checked}/${total}">${h.date.slice(8)}</div>`;
+  }).join('');
+  const fut=(future||[]).map(f=>
+    `<div class="cell plan ${f.count>0?'has-plan':''}" title="${esc(f.date)} 计划 ${f.count} 项">${f.date.slice(8)}${f.count>0?'·'+f.count:''}</div>`).join('');
+  return past+fut;
+}
+async function toggleGoal(gid,checked){
+  const d=await api('/api/users/'+cur+'/discipline/check',{goal_id:gid,checked});
+  renderDisc(d);
+}
+function addGoal(){
+  const title=prompt('待办名称：');
+  if(!title||!title.trim())return;
+  api('/api/users/'+cur+'/goals',{title:title.trim()}).then(()=>loadDiscipline());
+}
+async function addFocusMin(){
+  const v=document.getElementById('focus_add').value;
+  if(!v||Number(v)<=0)return;
+  const d=await api('/api/users/'+cur+'/discipline/focus',{minutes:Number(v)});
+  document.getElementById('focus_add').value='';
+  renderDisc(d);
+}
+function saveDiscNote(v){
+  clearTimeout(discNoteTimer);
+  discNoteTimer=setTimeout(async()=>{
+    await api('/api/users/'+cur+'/discipline/note',{note:v});
+  },500);
+}
+function renderTimer(){
+  const m=String(Math.floor(discSec/60)).padStart(2,'0');
+  const s=String(discSec%60).padStart(2,'0');
+  document.getElementById('timerBox').innerHTML=`<div class="timer-clock">${m}:${s}</div>`;
+}
+function discTimerStart(){
+  if(discRunning)return;
+  discRunning=true;discSec=0;
+  discTimer=setInterval(()=>{discSec++;renderTimer();},1000);
+  renderTimer();
+}
+async function discTimerStop(record){
+  if(discRunning){clearInterval(discTimer);discRunning=false;}
+  const min=Math.max(1,Math.round(discSec/60));
+  discSec=0;
+  document.getElementById('timerBox').innerHTML='';
+  if(record&&min>0){
+    const d=await api('/api/users/'+cur+'/discipline/focus',{minutes:min});
+    renderDisc(d);
+  }
+}
+
+// ---------- 交接（可编辑摘要 + 确认） ----------
+function openHandoff(cfg){
+  handoffCfg=cfg;
+  const names={explore:'带去练习',experiment:'变成小实验',experience:'收藏经验'};
+  document.getElementById('handoffHead').textContent=names[cfg.kind]||'交接确认';
+  document.getElementById('handoffTitle').value=cfg.title||'';
+  document.getElementById('handoffSummary').value=cfg.summary||'';
+  document.getElementById('handoffModal').classList.add('show');
+}
+function closeHandoff(){
+  document.getElementById('handoffModal').classList.remove('show');
+  handoffCfg=null;
+}
+function handoffConfirm(){
+  const title=document.getElementById('handoffTitle').value.trim();
+  const summary=document.getElementById('handoffSummary').value.trim();
+  const cfg=handoffCfg;
+  closeHandoff();
+  if(!title&&!summary)return;
+  if(cfg&&cfg.eventId){
+    handoffAction(cfg.kind, title, summary, cfg.source_ref, cfg.eventId);
+  }else if(cfg&&cfg.onConfirm){
+    cfg.onConfirm(title,summary);
+  }
+}
+function handoffPause(){
+  const title=document.getElementById('handoffTitle').value.trim();
+  const summary=document.getElementById('handoffSummary').value.trim();
+  const cfg=handoffCfg;
+  closeHandoff();
+  if(!title&&!summary)return;
+  if(cfg&&cfg.eventId){
+    api('/api/events/'+cfg.eventId+'/update',{title,summary});
+  }else{
+    api('/api/events',{user_id:cur,kind:cfg.kind,title,summary,source_ref:cfg.source_ref||''});
+  }
+  alert('已存草稿，去「成长档案 → 待续」继续');
+}
+function handoffAction(kind,title,summary,source_ref,eventId){
+  api('/api/events/'+eventId+'/update',{title,summary,status:'confirmed'});
+  if(kind==='explore'){ pendingSummary=summary; showView('theater'); }
+  else if(kind==='experiment'){
+    api('/api/experiments',{user_id:cur,source_scene:source_ref||'',hypothesis:title,action:summary,record_what:'',review_date:''});
+    showView('lab');
+  }else if(kind==='experience'){
+    api('/api/experience-cards',{user_id:cur,conclusion:summary,situation:source_ref||'',limitation:'',source_ref:source_ref||''});
+    alert('已收藏到经验卡');
+  }
+}
+function handoffSkip(){
+  const cfg=handoffCfg;
+  closeHandoff();
+  if(cfg&&cfg.onSkip)cfg.onSkip();
+}
+
+init();
+</script>
+</body>
+</html>

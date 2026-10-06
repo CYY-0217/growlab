@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>探索首页预览 B · 标本编辑 + 记忆图谱</title>
+<link rel="stylesheet" href="preview-shared.css">
+<style>
+/* 方向 B：标本编辑（主）+ 记忆图谱（辅）—— 网格 + 局部越界 */
+.specimen{background:var(--paper);border:1px solid var(--line);border-radius:14px;
+  padding:28px 26px;position:relative;overflow:hidden}
+.specimen::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--accent)}
+.spec-kicker{font-size:11px;letter-spacing:3px;color:var(--muted);
+  text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.spec-kicker::after{content:"";flex:1;height:1px;background:var(--line)}
+.specimen h1{font-size:28px;font-weight:600;letter-spacing:2px;margin:10px 0 4px}
+.spec-sub{font-size:13px;color:var(--muted);line-height:1.7;max-width:56ch}
+.spec-rule{border:none;border-top:1px solid var(--line);margin:16px 0}
+/* 标本签输入（同 A） */
+.spec-label{background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:16px 14px 12px;position:relative;margin-top:4px}
+.spec-no{position:absolute;top:-9px;left:12px;font-size:10px;letter-spacing:1px;
+  background:var(--accent);color:#fff;padding:1px 9px;border-radius:10px}
+.spec-label textarea{width:100%;background:transparent;border:none;font-size:15px;
+  min-height:56px;padding:2px 0;outline:none;font-family:inherit;resize:vertical;
+  background-image:repeating-linear-gradient(transparent 0 27px, var(--line) 27px 28px);
+  line-height:28px}
+/* 图谱网格 + 越界焦点 */
+.spec-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.spec-card{background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:14px;display:flex;flex-direction:column;gap:4px}
+.spec-card .no{font-size:10px;color:var(--muted);letter-spacing:1.5px}
+.spec-card .nm{font-size:15px;font-weight:600;line-height:1.4}
+.spec-card .why{font-size:12px;color:var(--muted);line-height:1.55;flex:1}
+.spec-card .rule{border-top:1px solid var(--line);margin:8px 0 2px}
+.spec-card .row{display:flex;gap:6px;align-items:center}
+/* 越界：建议先试 跨整行 + 强调描边 + 轻微上浮 */
+.spec-card.first{grid-column:1/-1;border-color:var(--accent);
+  box-shadow:0 4px 16px rgba(133,60,30,.14);transform:translateY(-1px)}
+@media(max-width:520px){.specimen{padding:22px 16px}.specimen h1{font-size:24px}
+  .spec-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="preview-tag">预览 · 方向 B <b>标本编辑 + 记忆图谱</b></div>
+  <div class="notice">这是<b>纯预览</b>，按钮不接真实业务；示例方向为占位数据。状态用下面按钮切换。</div>
+
+  <div class="states">
+    <button class="on" data-s="result">结果</button>
+    <button data-s="empty">空</button>
+    <button data-s="loading">加载</button>
+    <button data-s="error">错误</button>
+  </div>
+
+  <div class="specimen">
+    <div class="spec-kicker">EXPLORATION · 标本 001</div>
+    <h1>探索空间</h1>
+    <div class="spec-sub">别急着定目标。写下你的模糊感受，Agent 帮你转成「可以试一试的方向」——所有推断都是可编辑的假设，不是定论。</div>
+    <hr class="spec-rule">
+
+    <div class="spec-label">
+      <span class="spec-no">标本 · 输入</span>
+      <textarea placeholder="例：最近很迷茫，不知道该把时间花在什么上"></textarea>
+    </div>
+    <div style="margin-top:10px"><button class="act primary">探索方向（预览）</button></div>
+
+    <div style="margin-top:16px">
+      <div class="state show" data-panel="result">
+        <div class="spec-grid">
+          <div class="spec-card"><div class="no">方向 01</div><div class="nm">把手机留在客厅</div>
+            <div class="why">不是睡不着，是没人催就不想下线。</div>
+            <div class="rule"></div>
+            <div class="row"><span style="font-size:11px;color:var(--ok)">成本·低</span><button class="act narrow">🎭 带去练习（预览）</button></div></div>
+          <div class="spec-card"><div class="no">方向 02</div><div class="nm">睡前 30 分钟调暗灯光</div>
+            <div class="why">用环境信号把「该睡了」变得可感知。</div>
+            <div class="rule"></div>
+            <div class="row"><span style="font-size:11px;color:var(--ok)">成本·低</span><button class="act narrow">🎭 带去练习（预览）</button></div></div>
+          <div class="spec-card first"><div class="no">★ 建议先试</div><div class="nm">今晚把手机留在客厅</div>
+            <div class="why">最小动作、今晚就能验证。</div></div>
+        </div>
+      </div>
+      <div class="state" data-panel="empty"><div class="empty-hint">还没有方向。写下感受点「探索方向」。</div></div>
+      <div class="state" data-panel="loading"><div class="loading-hint">探索中…</div></div>
+      <div class="state" data-panel="error"><div class="error-hint">调用失败，输入已保留，可重试。</div></div>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.states button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.states button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    const s=b.dataset.s;
+    document.querySelectorAll('.state').forEach(p=>p.classList.toggle('show',p.dataset.panel===s));
+  };
+});
+</script>
+</body>
+</html>

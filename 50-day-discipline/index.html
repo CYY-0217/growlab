@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>50天自律挑战</title>
+<style>
+:root{
+  --bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+  --txt:#e8eaed;--mut:#8a909c;--acc:#5b8cff;--acc2:#34d399;
+  --warn:#fbbf24;--bad:#f87171;--rad:14px;
+}
+[data-theme="light"]{
+  --bg:#f4f6fa;--panel:#ffffff;--panel2:#eef1f6;--line:#e0e4ec;
+  --txt:#1a1d24;--mut:#6b7280;--acc:#3b6fe0;--acc2:#10b981;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC",system-ui,sans-serif;
+  background:var(--bg);color:var(--txt);line-height:1.5;
+  -webkit-font-smoothing:antialiased;padding-bottom:40px}
+.wrap{max-width:880px;margin:0 auto;padding:20px 16px}
+header{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;flex-wrap:wrap;gap:12px}
+h1{font-size:22px;font-weight:700}
+h1 span{color:var(--acc)}
+.sub{color:var(--mut);font-size:13px;margin-top:2px}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:10px;
+  background:var(--panel2);color:var(--txt);padding:8px 14px;font-size:14px;
+  transition:.15s;border:1px solid var(--line)}
+button:hover{border-color:var(--acc);transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+.btn-acc{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:8px}
+.icon-btn{background:none;border:none;padding:4px 8px;font-size:18px}
+.card{background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--rad);padding:18px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);
+  padding:14px;text-align:center}
+.stat .num{font-size:26px;font-weight:800;color:var(--acc)}
+.stat .lbl{font-size:11px;color:var(--mut);margin-top:2px}
+.stat.s2 .num{color:var(--acc2)}
+.stat.s3 .num{color:var(--warn)}
+.stat.s4 .num{color:var(--bad)}
+.phase-bar{display:flex;gap:6px;margin-bottom:8px}
+.phase{flex:1;text-align:center;font-size:11px;color:var(--mut);
+  padding:6px 2px;border-radius:8px;background:var(--panel2);border:1px solid var(--line)}
+.phase.on{color:#fff;background:var(--acc);border-color:var(--acc);font-weight:600}
+.phase.done{color:var(--acc2);border-color:var(--acc2)}
+.cal{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:14px}
+.day{aspect-ratio:1;border-radius:9px;background:var(--panel2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  cursor:pointer;transition:.12s;position:relative;color:var(--mut)}
+.day:hover{border-color:var(--acc);transform:scale(1.06)}
+.day.today{box-shadow:0 0 0 2px var(--acc)}
+.day.full{background:var(--acc2);color:#04231a;font-weight:700;border-color:var(--acc2)}
+.day.part{background:linear-gradient(135deg,var(--acc2) 0%,var(--panel2) 100%);color:var(--txt)}
+.day.cur{border-color:var(--acc);color:var(--txt)}
+.day .dot{position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--warn)}
+.quote{font-style:italic;color:var(--mut);font-size:14px;border-left:3px solid var(--acc);
+  padding:6px 0 6px 12px;margin:4px 0 14px}
+.dom{margin-bottom:14px}
+.dom-h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;
+  margin-bottom:8px;color:var(--acc)}
+.dom-h .cnt{font-size:11px;color:var(--mut);font-weight:400}
+.cat{margin:6px 0 6px 4px}
+.cat-h{font-size:12px;color:var(--mut);margin-bottom:4px;font-weight:600}
+.habit{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;
+  background:var(--panel2);margin-bottom:6px;border:1px solid transparent;transition:.12s}
+.habit.checked{border-color:var(--acc2);background:linear-gradient(90deg,rgba(52,211,153,.12),var(--panel2))}
+.habit .box{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
+.habit.checked .box{background:var(--acc2);border-color:var(--acc2)}
+.habit .name{flex:1;font-size:14px}
+.habit.checked .name{color:var(--mut);text-decoration:line-through}
+.habit .del{opacity:0;font-size:13px;color:var(--bad);background:none;border:none;padding:2px 6px}
+.habit:hover .del{opacity:1}
+.focus-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--panel2);
+  border-radius:10px;margin-bottom:6px;font-size:13px}
+.focus-row .tag{background:var(--acc);color:#fff;padding:2px 8px;border-radius:6px;font-size:11px}
+.focus-row .min{margin-left:auto;font-weight:700;color:var(--acc2)}
+.timer{text-align:center;padding:10px}
+.timer .clock{font-size:42px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.timer .ctrls{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+textarea,input,select{font-family:inherit;background:var(--panel2);color:var(--txt);
+  border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:14px;width:100%}
+textarea{resize:vertical;min-height:64px}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+.row .narrow{flex:0 0 auto}
+label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px;margin-top:8px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;
+  align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.show{display:flex}
+.modal .box{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);
+  padding:20px;max-width:420px;width:100%;max-height:90vh;overflow:auto}
+.modal h3{margin-bottom:6px}
+.modal .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.bar{height:8px;background:var(--panel2);border-radius:5px;overflow:hidden;margin-top:8px}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:.4s}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.nav .t{font-weight:700;font-size:16px}
+.muted{color:var(--mut);font-size:13px}
+.section-t{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:10px}
+@media(max-width:600px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .cal{grid-template-columns:repeat(5,1fr)}
+  .phase-bar{flex-wrap:wrap}.phase{flex:1 1 30%}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<!--JS-->
+<script>
+const KEY='disc50_v1';
+const TOTAL=50;
+
+// 阶段定义：5阶段 × 10天
+const PHASES=[
+  {name:'唤醒期',d:'建立基础节奏',from:1,to:10},
+  {name:'巩固期',d:'让习惯稳定下来',from:11,to:20},
+  {name:'深化期',d:'提高强度与专注',from:21,to:30},
+  {name:'攻坚期',d:'突破舒适区',from:31,to:40},
+  {name:'蜕变期',d:'内化为自我',from:41,to:50},
+];
+
+// 每日金句库
+const QUOTES=[
+ "自律不是限制，而是给你更多选择的自由。",
+ "你今天不想做的事，正是明天的你感谢现在的事。",
+ "把大目标拆成今天能完成的一小步。",
+ "状态是靠行动带出来的，不是等出来的。",
+ "重复造就习惯，习惯造就命运。",
+ "专注一件事，胜过同时分心十件事。",
+ "进步往往悄无声息，坚持才能看见。",
+ "对自己的承诺，是最该守住的承诺。",
+ "今天的汗水，是明天的底气。",
+ "不必完美，只需不停。",
+ "微小而持续的努力，复利惊人。",
+ "你不是缺时间，是缺把时间用在重要事上的决心。",
+ "管住当下的冲动，换来长久的从容。",
+ "每完成一次，就离想成为的人更近一步。",
+ "节奏比速度更重要。",
+];
+
+// 默认习惯库：领域 → 分类 → 习惯
+const DEFAULT_HABITS=[
+ {id:'h1',domain:'学习',cat:'学校',name:'完成当日课程/作业'},
+ {id:'h2',domain:'学习',cat:'自我提升',name:'深度学习 1 小时'},
+ {id:'h3',domain:'学习',cat:'自我提升',name:'练习英语 30 分钟'},
+ {id:'h4',domain:'生活',cat:'健身',name:'运动 / 锻炼身体'},
+ {id:'h5',domain:'生活',cat:'阅读',name:'读书 20 页'},
+ {id:'h6',domain:'生活',cat:'作息',name:'23:30 前睡觉'},
+ {id:'h7',domain:'生活',cat:'健康',name:'喝够 2L 水'},
+ {id:'h8',domain:'心态',cat:'反思',name:'写当日复盘'},
+];
+
+// 默认领域颜色顺序（决定渲染顺序）
+const DOMAIN_ORDER=['学习','生活','心态'];
+
+function todayDayNum(state){
+  // 根据 startDate 计算当前是第几天（1..50）
+  if(!state.startDate) return 1;
+  const start=new Date(state.startDate+'T00:00:00');
+  const now=new Date();const t=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const diff=Math.floor((t-start)/86400000)+1;
+  return Math.min(Math.max(diff,1),TOTAL);
+}
+
+function defaultState(){
+  return {
+    startDate:new Date().toISOString().slice(0,10),
+    habits:JSON.parse(JSON.stringify(DEFAULT_HABITS)),
+    // logs[day] = {checks:{habitId:true}, focus:[{label,min}], note:''}
+    logs:{},
+    theme:'dark',
+    viewDay:null, // 正在查看的天，null=今天
+  };
+}
+
+let state=load();
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.habits)return s;}catch(e){}
+  return defaultState();
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+
+function getLog(day){
+  if(!state.logs[day])state.logs[day]={checks:{},focus:[],note:''};
+  const l=state.logs[day];
+  if(!l.checks)l.checks={};if(!l.focus)l.focus=[];if(l.note==null)l.note='';
+  return l;
+}
+function curDay(){return state.viewDay||todayDayNum(state);}
+function phaseOf(day){return PHASES.find(p=>day>=p.from&&day<=p.to);}
+
+// ---- 统计 ----
+function dayCompletion(day){
+  const l=state.logs[day];if(!l||!l.checks)return 0;
+  const total=state.habits.length||1;
+  const done=state.habits.filter(h=>l.checks[h.id]).length;
+  return done/total;
+}
+function computeStats(){
+  const td=todayDayNum(state);
+  let checkedDays=0,totalChecks=0,totalFocus=0;
+  for(let d=1;d<=TOTAL;d++){
+    const l=state.logs[d];if(!l)continue;
+    const c=state.habits.filter(h=>l.checks&&l.checks[h.id]).length;
+    totalChecks+=c;
+    if(c>0)checkedDays++;
+    (l.focus||[]).forEach(f=>totalFocus+=Number(f.min)||0);
+  }
+  // streak：从今天往回数连续“有打卡”的天数
+  let streak=0;
+  for(let d=td;d>=1;d--){
+    const l=state.logs[d];
+    const c=l&&l.checks?state.habits.filter(h=>l.checks[h.id]).length:0;
+    if(c>0)streak++;else break;
+  }
+  const overall=Math.round((totalChecks/((state.habits.length||1)*TOTAL))*100);
+  return {td,checkedDays,totalChecks,totalFocus,streak,overall};
+}
+
+function esc(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+// ---- 渲染 ----
+function render(){
+  document.body.setAttribute('data-theme',state.theme);
+  const st=computeStats();
+  const day=curDay();
+  const ph=phaseOf(day);
+  const quote=QUOTES[(day-1)%QUOTES.length];
+  const log=getLog(day);
+  const isToday=day===st.td;
+
+  let html=`
+  <header>
+    <div>
+      <h1>50天<span>自律挑战</span></h1>
+      <div class="sub">开始于 ${state.startDate} · 今天是第 ${st.td} 天</div>
+    </div>
+    <div class="row narrow" style="gap:8px">
+      <button class="icon-btn" onclick="toggleTheme()" title="切换主题">${state.theme==='dark'?'☀️':'🌙'}</button>
+      <button class="btn-sm" onclick="openSettings()">⚙️ 设置</button>
+    </div>
+  </header>`;
+
+  // 统计卡
+  html+=`<div class="stats">
+    <div class="stat"><div class="num">${st.streak}</div><div class="lbl">连续天数 🔥</div></div>
+    <div class="stat s2"><div class="num">${st.checkedDays}</div><div class="lbl">已打卡天数</div></div>
+    <div class="stat s3"><div class="num">${st.overall}%</div><div class="lbl">总完成率</div></div>
+    <div class="stat s4"><div class="num">${Math.round(st.totalFocus/60*10)/10}h</div><div class="lbl">累计专注</div></div>
+  </div>`;
+
+  // 阶段条
+  html+=`<div class="card"><div class="phase-bar">`;
+  PHASES.forEach(p=>{
+    const isOn=st.td>=p.from&&st.td<=p.to;
+    const isDone=st.td>p.to;
+    html+=`<div class="phase ${isOn?'on':''} ${isDone?'done':''}">
+      ${p.name}<br><span style="font-size:9px;opacity:.8">第${p.from}-${p.to}天</span></div>`;
+  });
+  html+=`</div><div class="muted" style="text-align:center;margin-top:4px">
+    当前阶段：<b style="color:var(--acc)">${ph.name}</b> — ${ph.d}</div>`;
+  // 总进度条
+  html+=`<div class="bar"><div style="width:${st.td/TOTAL*100}%"></div></div>`;
+  html+=`<div class="muted" style="margin-top:4px">进度 ${st.td}/${TOTAL} 天</div></div>`;
+
+  // 50天日历
+  html+=`<div class="card"><div class="section-t">50天总览（点击查看某天）</div><div class="cal">`;
+  for(let d=1;d<=TOTAL;d++){
+    const comp=dayCompletion(d);
+    const l=state.logs[d];
+    const hasNote=l&&l.note&&l.note.trim();
+    let cls='day';
+    if(comp>=1)cls+=' full';else if(comp>0)cls+=' part';
+    if(d===st.td)cls+=' today';
+    if(d===day&&day!==st.td)cls+=' cur';
+    html+=`<div class="${cls}" onclick="gotoDay(${d})" title="第${d}天 ${Math.round(comp*100)}%">${d}${hasNote?'<span class="dot"></span>':''}</div>`;
+  }
+  html+=`</div></div>`;
+
+  html+=renderDayCard(day,isToday,quote,log);
+  html+=`<div class="muted" style="text-align:center;margin-top:20px">数据自动保存在本机浏览器 · <a href="#" onclick="exportData();return false" style="color:var(--acc)">导出备份</a></div>`;
+
+  document.getElementById('app').innerHTML=html;
+}
+
+// 当天卡片：导航 + 金句 + 习惯分组 + 专注 + 笔记
+function renderDayCard(day,isToday,quote,log){
+  let h=`<div class="card">
+    <div class="nav">
+      <button class="btn-sm" onclick="gotoDay(${Math.max(1,day-1)})" ${day<=1?'disabled':''}>← 前一天</button>
+      <div class="t">第 ${day} 天 ${isToday?'<span style="color:var(--acc2)">· 今天</span>':''}</div>
+      <button class="btn-sm" onclick="gotoDay(${Math.min(TOTAL,day+1)})" ${day>=TOTAL?'disabled':''}>后一天 →</button>
+    </div>
+    <div class="quote">"${quote}"</div>`;
+
+  // 习惯按 领域 → 分类 分组
+  const byDomain={};
+  state.habits.forEach(hb=>{
+    const dm=hb.domain||'其他';const ct=hb.cat||'其他';
+    byDomain[dm]=byDomain[dm]||{};
+    byDomain[dm][ct]=byDomain[dm][ct]||[];
+    byDomain[dm][ct].push(hb);
+  });
+  const domains=Object.keys(byDomain).sort((a,b)=>{
+    const ia=DOMAIN_ORDER.indexOf(a),ib=DOMAIN_ORDER.indexOf(b);
+    return(ia<0?99:ia)-(ib<0?99:ib);
+  });
+  h+=`<div class="section-t" style="margin-top:6px">每日习惯打卡</div>`;
+  domains.forEach(dm=>{
+    const cats=byDomain[dm];
+    let total=0,done=0;
+    Object.values(cats).forEach(arr=>arr.forEach(hb=>{total++;if(log.checks[hb.id])done++;}));
+    h+=`<div class="dom"><div class="dom-h">${dm} <span class="cnt">${done}/${total}</span></div>`;
+    Object.keys(cats).forEach(ct=>{
+      h+=`<div class="cat"><div class="cat-h">${esc(ct)}</div>`;
+      cats[ct].forEach(hb=>{
+        const ck=!!log.checks[hb.id];
+        h+=`<div class="habit ${ck?'checked':''}">
+          <div class="box" onclick="toggleHabit('${hb.id}')">${ck?'✓':''}</div>
+          <div class="name" onclick="toggleHabit('${hb.id}')">${esc(hb.name)}</div>
+          <button class="del" onclick="delHabit('${hb.id}')">删除</button>
+        </div>`;
+      });
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  });
+  h+=`<button class="btn-sm" onclick="openAddHabit()">＋ 添加习惯</button>`;
+
+  // 专注时长
+  h+=`<div class="section-t" style="margin-top:18px">专注时长记录</div>`;
+  if(log.focus&&log.focus.length){
+    log.focus.forEach((f,i)=>{
+      h+=`<div class="focus-row"><span class="tag">${esc(f.label)}</span>
+        <span class="min">${f.min} 分钟</span>
+        <button class="del" style="opacity:1" onclick="delFocus(${i})">✕</button></div>`;
+    });
+    const sum=log.focus.reduce((a,f)=>a+(Number(f.min)||0),0);
+    h+=`<div class="muted" style="text-align:right;margin-top:4px">今日合计 <b style="color:var(--acc2)">${sum}</b> 分钟</div>`;
+  }else{
+    h+=`<div class="muted">还没有专注记录</div>`;
+  }
+  h+=`<div class="row" style="margin-top:8px">
+    <button class="btn-sm" onclick="openTimer()">⏱ 开始专注计时</button>
+    <button class="btn-sm narrow" onclick="openAddFocus()">＋ 手动记录</button>
+  </div>`;
+
+  // 反思笔记
+  h+=`<div class="section-t" style="margin-top:18px">今日复盘</div>
+    <textarea id="noteBox" placeholder="今天做得好的、想改进的、明天的计划..." oninput="saveNote(this.value)">${esc(log.note)}</textarea>`;
+
+  h+=`</div>`;
+  return h;
+}
+
+// ---- 交互 ----
+function gotoDay(d){state.viewDay=(d===todayDayNum(state))?null:d;save();render();}
+function toggleTheme(){state.theme=state.theme==='dark'?'light':'dark';save();render();}
+function toggleHabit(id){
+  const l=getLog(curDay());
+  l.checks[id]=!l.checks[id];
+  if(!l.checks[id])delete l.checks[id];
+  save();render();
+}
+function delHabit(id){
+  if(!confirm('删除这个习惯？历史打卡记录也会从统计中移除。'))return;
+  state.habits=state.habits.filter(h=>h.id!==id);
+  save();render();
+}
+function saveNote(v){
+  const l=getLog(curDay());l.note=v;
+  clearTimeout(window._nt);window._nt=setTimeout(save,400);
+  // 不重渲染，避免光标跳动；但更新日历小圆点延后
+}
+function delFocus(i){const l=getLog(curDay());l.focus.splice(i,1);save();render();}
+function addFocus(label,min){
+  min=Number(min);if(!label||!min||min<=0)return false;
+  const l=getLog(curDay());l.focus.push({label,min});save();render();return true;
+}
+
+// ---- 模态框 ----
+function modal(html){
+  document.getElementById('modalBox').innerHTML=html;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target.id==='modal')closeModal();
+});
+
+function openAddHabit(){
+  // 收集已有领域/分类做下拉
+  const doms=[...new Set([...DOMAIN_ORDER,...state.habits.map(h=>h.domain)])];
+  modal(`<h3>添加习惯</h3>
+    <label>领域</label>
+    <input id="ah_dom" list="ah_doms" placeholder="如 学习 / 生活 / 心态">
+    <datalist id="ah_doms">${doms.map(d=>`<option value="${esc(d)}">`).join('')}</datalist>
+    <label>分类</label>
+    <input id="ah_cat" placeholder="如 学校 / 自我提升 / 健身 / 阅读">
+    <label>习惯名称</label>
+    <input id="ah_name" placeholder="如 背 30 个单词">
+    <div class="acts">
+      <button onclick="closeModal()">取消</button>
+      <button class="btn-acc" onclick="doAddHabit()">添加</button>
+    </div>`);
+  setTimeout(()=>document.getElementById('ah_dom').focus(),50);
+}
+function doAddHabit(){
+  const dom=document.getElementById('ah_dom').value.trim()||'其他';
+  const cat=document.getElementById('ah_cat').value.trim()||'其他';
+  const name=document.getElementById('ah_name').value.trim();
+  if(!name){alert('请输入习惯名称');return;}
+  state.habits.push({id:'h'+Date.now(),domain:dom,cat,name});
+  save();closeModal();render();
+}
+
+function openAddFocus(){
+  const labels=['学校学习','自我提升','英语','阅读','工作','运动','其它'];
+  modal(`<h3>记录专注时长</h3>
+    <label>类别</label>
+    <input id="fc_lbl" list="fc_lbls" placeholder="这段专注做了什么">
+    <datalist id="fc_lbls">${labels.map(l=>`<option value="${l}">`).join('')}</datalist>
+    <label>时长（分钟）</label>
+    <input id="fc_min" type="number" min="1" placeholder="如 45">
+    <div class="acts">
+      <button onclick="closeModal()">取消</button>
+      <button class="btn-acc" onclick="doAddFocus()">添加</button>
+    </div>`);
+  setTimeout(()=>document.getElementById('fc_lbl').focus(),50);
+}
+function doAddFocus(){
+  const lbl=document.getElementById('fc_lbl').value.trim()||'专注';
+  const min=document.getElementById('fc_min').value;
+  if(!addFocus(lbl,min)){alert('请输入有效时长');return;}
+  closeModal();
+}
+
+// ---- 专注计时器 ----
+let timer={int:null,sec:0,running:false,label:'专注'};
+function openTimer(){
+  timer={int:null,sec:0,running:false,label:'专注'};
+  const labels=['学校学习','自我提升','英语','阅读','工作','运动','其它'];
+  modal(`<h3>专注计时</h3>
+    <label>专注类别</label>
+    <input id="tm_lbl" list="tm_lbls" value="自我提升">
+    <datalist id="tm_lbls">${labels.map(l=>`<option value="${l}">`).join('')}</datalist>
+    <div class="timer">
+      <div class="clock" id="tm_clock">00:00</div>
+      <div class="ctrls">
+        <button class="btn-acc" id="tm_toggle" onclick="timerToggle()">▶ 开始</button>
+        <button onclick="timerSaveStop()">保存并结束</button>
+        <button onclick="timerCancel()">放弃</button>
+      </div>
+      <div class="muted" style="margin-top:8px">结束后会把分钟数记入今日专注</div>
+    </div>`);
+}
+function timerFmt(){
+  const m=String(Math.floor(timer.sec/60)).padStart(2,'0');
+  const s=String(timer.sec%60).padStart(2,'0');
+  const el=document.getElementById('tm_clock');if(el)el.textContent=m+':'+s;
+}
+function timerToggle(){
+  const btn=document.getElementById('tm_toggle');
+  if(timer.running){
+    clearInterval(timer.int);timer.running=false;if(btn)btn.textContent='▶ 继续';
+  }else{
+    timer.running=true;if(btn)btn.textContent='⏸ 暂停';
+    timer.int=setInterval(()=>{timer.sec++;timerFmt();},1000);
+  }
+}
+function timerSaveStop(){
+  clearInterval(timer.int);
+  const lbl=(document.getElementById('tm_lbl')||{}).value||'专注';
+  const min=Math.max(1,Math.round(timer.sec/60));
+  if(timer.sec<30){if(!confirm('专注时间不足 1 分钟，仍要记录吗？')){return;}}
+  addFocus(lbl.trim()||'专注',min);
+  closeModal();
+}
+function timerCancel(){clearInterval(timer.int);closeModal();}
+
+// ---- 设置 ----
+function openSettings(){
+  modal(`<h3>设置</h3>
+    <label>挑战开始日期</label>
+    <input id="se_start" type="date" value="${state.startDate}">
+    <div class="muted" style="margin-top:4px">改动会重新计算“今天是第几天”，打卡记录按天保留。</div>
+    <label style="margin-top:14px">数据管理</label>
+    <div class="row" style="margin-top:4px">
+      <button class="btn-sm" onclick="exportData()">导出备份</button>
+      <button class="btn-sm" onclick="document.getElementById('imp').click()">导入备份</button>
+    </div>
+    <input id="imp" type="file" accept=".json" style="display:none" onchange="importData(this)">
+    <button class="btn-sm" style="margin-top:12px;color:var(--bad);border-color:var(--bad)" onclick="resetAll()">⚠ 重置全部数据</button>
+    <div class="acts">
+      <button onclick="closeModal()">取消</button>
+      <button class="btn-acc" onclick="saveSettings()">保存</button>
+    </div>`);
+}
+function saveSettings(){
+  const sd=document.getElementById('se_start').value;
+  if(sd)state.startDate=sd;
+  state.viewDay=null;save();closeModal();render();
+}
+function resetAll(){
+  if(!confirm('确定重置？所有打卡、专注和笔记都会清空，无法恢复。'))return;
+  state=defaultState();save();closeModal();render();
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='50day-discipline-'+state.startDate+'.json';a.click();
+}
+function importData(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{try{const d=JSON.parse(e.target.result);
+    if(!d.habits)throw 0;state=d;save();closeModal();render();
+    }catch(err){alert('文件格式不正确');}};
+  r.readAsText(f);
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrowLab · 个人成长实验室</title>
+<style>
+/* ============================================================
+   GrowLab 展示页 · Seder 新艺术植物纹样 (Anton Seder, 1886)
+   单文件 · 离线可用 · 无 CDN · 无密钥 · 无真实隐私数据
+   主题切换：data-theme 四套色板
+   ============================================================ */
+
+/* ---------- 字体（大陆友好，无 Google Fonts 依赖） ---------- */
+:root{
+  --font-display: "Songti SC","Noto Serif SC","STSong","SimSun",serif;
+  --font-body: "Noto Serif SC","Songti SC","STSong",serif;
+  --font-ui: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+}
+
+/* ---------- 四套主题色板（默认 gold 金底果实） ---------- */
+:root, [data-theme="gold"]{
+  --bg:#E8DCC3; --bg-deep:#DCCDA9;
+  --ink:#1F2A24; --accent:#8A6D1F; --accent-strong:#6E5514; --mordant:#5C3A2E; --line:#1F2A24;
+}
+[data-theme="iris"]{
+  --bg:#D8D4C8; --bg-deep:#C4BFB0;
+  --ink:#23203A; --accent:#3E4E8C; --accent-strong:#2E3C70; --mordant:#6B4E7E; --line:#23203A;
+}
+[data-theme="pergament"]{
+  --bg:#EDE4D0; --bg-deep:#E0D4BA;
+  --ink:#3A2F23; --accent:#5C4A2E; --accent-strong:#463820; --mordant:#7A3B2E; --line:#3A2F23;
+}
+[data-theme="distel"]{
+  --bg:#E3D5BF; --bg-deep:#D2C1A4;
+  --ink:#2A2620; --accent:#9A4632; --accent-strong:#7D3626; --mordant:#4E5B3A; --line:#2A2620;
+}
+
+/* ---------- 语义 Token 映射 ---------- */
+:root{
+  --surface: var(--bg);
+  --surface-raised: color-mix(in srgb, var(--bg) 88%, #fff);
+  --surface-sunken: var(--bg-deep);
+  --text: var(--ink);
+  --text-muted: color-mix(in srgb, var(--ink) 72%, var(--bg));
+  --brand: var(--accent);
+  --brand-active: var(--accent-strong);
+  --link: var(--mordant);
+  --stroke: var(--line);
+  --focus-ring: var(--mordant);
+  --success:#4E5B3A;
+  --danger:#8C2F22;
+  --radius:2px;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:17px; line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  transition: background .4s ease, color .4s ease;
+}
+
+/* 细密排线纹理（随主题淡色） */
+.hatch{
+  background-image:repeating-linear-gradient(
+    45deg,
+    transparent 0 3px,
+    color-mix(in srgb, var(--ink) 5%, transparent) 3px 4px);
+}
+
+/* ---------- 顶部条 ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:12px 22px;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--stroke);
+}
+.topbar .brand{ font-family:var(--font-display); letter-spacing:.04em; font-size:17px; display:flex; align-items:center; gap:9px; }
+.topbar .brand .mark{ color:var(--brand); }
+.theme-sel{
+  appearance:none; -webkit-appearance:none; cursor:pointer;
+  background:var(--surface-raised); color:var(--text);
+  border:1.5px solid var(--stroke); border-radius:var(--radius);
+  font-family:var(--font-ui); font-size:13px; letter-spacing:.04em;
+  padding:6px 26px 6px 10px;
+  background-image:linear-gradient(45deg, transparent 50%, var(--text) 50%),
+                   linear-gradient(135deg, var(--text) 50%, transparent 50%);
+  background-position:calc(100% - 13px) 55%, calc(100% - 8px) 55%;
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+}
+.theme-sel:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:2px; }
+
+/* ---------- 版式容器 ---------- */
+.wrap{ max-width:920px; margin:0 auto; padding:0 24px 96px; }
+
+/* ---------- 图版编号（Tafel 小号大写） ---------- */
+.tafel{
+  font-family:var(--font-display); font-size:12px;
+  letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted);
+  display:flex; align-items:center; gap:12px; margin:56px 0 8px;
+}
+.tafel::after{ content:""; flex:1; height:1px; background:var(--stroke); opacity:.5; }
+
+/* ---------- 标题 ---------- */
+h1,h2,h3{ font-family:var(--font-display); font-weight:600; line-height:1.3; }
+h1{ font-size:44px; letter-spacing:.02em; margin:0 0 6px; }
+h2{ font-size:26px; margin:0 0 16px; letter-spacing:.02em; }
+h3{ font-size:19px; margin:0 0 6px; }
+.lead{ font-size:19px; color:var(--text-muted); }
+
+/* ---------- 封面 Hero ---------- */
+.hero{ padding:64px 0 20px; text-align:center; position:relative; }
+.hero .rule{ color:var(--brand); font-family:var(--font-ui); letter-spacing:.3em; font-size:12px; text-transform:uppercase; margin-bottom:14px; }
+.hero .tagline{ max-width:640px; margin:18px auto 0; font-size:20px; }
+
+/* 植物分隔带：1px 线 + 中央纹样 */
+.divider{ display:flex; align-items:center; gap:16px; margin:44px 0; color:var(--brand); }
+.divider::before, .divider::after{ content:""; flex:1; height:1px; background:var(--stroke); }
+.divider svg{ width:34px; height:34px; flex:none; }
+
+/* ---------- 双线框卡片（+ 四角菱形角饰） ---------- */
+.frame{
+  position:relative;
+  border:2px solid var(--stroke); border-radius:var(--radius);
+  padding:26px 28px; background:var(--surface-raised);
+}
+.frame::after{
+  content:""; position:absolute; inset:5px;
+  border:1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  border-radius:var(--radius); pointer-events:none;
+}
+.corners{ position:absolute; inset:0; pointer-events:none; }
+.corners svg{ position:absolute; width:26px; height:26px; color:var(--brand); }
+.corners .tl{ top:9px; left:9px; }
+.corners .tr{ top:9px; right:9px; transform:rotate(90deg); }
+.corners .br{ bottom:9px; right:9px; transform:rotate(180deg); }
+.corners .bl{ bottom:9px; left:9px; transform:rotate(270deg); }
+
+/* ---------- 痛点三冲突 ---------- */
+.pains{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.pain{ padding:22px 20px; text-align:center; }
+.pain .big{ font-family:var(--font-display); font-size:20px; color:var(--brand); margin-bottom:8px; }
+.pain .t{ font-weight:600; margin-bottom:6px; }
+.pain p{ font-size:15px; color:var(--text-muted); margin:0; }
+
+/* ---------- 闭环图 ---------- */
+.loop{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; margin:26px 0; }
+.step{
+  border:1.5px solid var(--stroke); border-radius:var(--radius);
+  padding:12px 16px; font-family:var(--font-display); font-size:16px;
+  background:var(--surface-raised); letter-spacing:.04em; white-space:nowrap;
+}
+.step b{ color:var(--brand); font-weight:600; }
+.step.core{ border-color:var(--brand); background:color-mix(in srgb, var(--brand) 8%, var(--bg)); }
+.arrow{ color:var(--brand); font-size:22px; line-height:1; }
+
+/* ---------- 空间卡片 ---------- */
+.spaces{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.space{ padding:24px; }
+.space .head{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.space .head .ico{ width:34px; height:34px; color:var(--brand); flex:none; }
+.space .head .nm{ font-family:var(--font-display); font-size:20px; }
+.space .head .en{ font-family:var(--font-ui); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
+.space p{ margin:0; font-size:15px; color:var(--text-muted); }
+.space .loop-tag{
+  display:inline-block; margin-top:12px; font-family:var(--font-ui); font-size:11px;
+  letter-spacing:.08em; color:var(--brand); border:1px solid var(--brand);
+  border-radius:var(--radius); padding:2px 8px;
+}
+.support{ margin-top:18px; font-size:14px; color:var(--text-muted); text-align:center; }
+.support b{ color:var(--text); }
+
+/* ---------- 演示例子（情境剧场） ---------- */
+.demo{ padding:8px 4px; }
+.scene-label{ font-family:var(--font-ui); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:16px; }
+.chat{ display:flex; flex-direction:column; gap:12px; }
+.msg{ max-width:76%; padding:11px 15px; border:1.5px solid var(--stroke); border-radius:var(--radius); font-size:15px; }
+.msg.me{ align-self:flex-end; background:var(--surface-raised); text-align:right; }
+.msg.they{ align-self:flex-start; background:var(--surface-sunken); }
+.msg .who{ font-family:var(--font-ui); font-size:11px; letter-spacing:.08em; color:var(--text-muted); display:block; margin-bottom:2px; }
+.msg.me .who{ text-align:right; }
+.branch{ margin:26px 0 10px; font-family:var(--font-ui); font-size:12px; letter-spacing:.12em; color:var(--brand); text-transform:uppercase; }
+.insight{
+  margin-top:28px; border-left:3px solid var(--mordant);
+  background:var(--surface-sunken); padding:16px 20px; border-radius:0 var(--radius) var(--radius) 0;
+}
+.insight .lab{ font-family:var(--font-ui); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--mordant); margin-bottom:6px; }
+.insight p{ margin:0; font-size:17px; font-family:var(--font-display); }
+.insight .sub{ display:block; margin-top:6px; font-size:14px; color:var(--text-muted); font-family:var(--font-body); }
+
+/* ---------- 技术 / 边界列表 ---------- */
+.grid2{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.kv{ padding:20px 24px; }
+.kv .k{ font-family:var(--font-display); font-size:17px; color:var(--brand); margin-bottom:8px; }
+.kv ul{ margin:0; padding-left:18px; }
+.kv li{ margin:5px 0; font-size:15px; }
+.check{ list-style:none; padding-left:0 !important; }
+.check li{ position:relative; padding-left:22px; }
+.check li::before{
+  content:""; position:absolute; left:2px; top:7px; width:9px; height:9px;
+  border:1.5px solid var(--brand); transform:rotate(45deg);
+}
+.check li::after{
+  content:""; position:absolute; left:5px; top:10px; width:3px; height:3px; background:var(--brand); transform:rotate(45deg);
+}
+
+.status{ margin-top:22px; padding:20px 24px; }
+.status .row{ display:flex; gap:12px; align-items:baseline; margin:8px 0; font-size:15px; }
+.status .row .s{ color:var(--brand); font-weight:600; flex:none; }
+
+/* ---------- 页脚 ---------- */
+footer{
+  margin-top:80px; padding:36px 0 40px; text-align:center;
+  border-top:2px solid var(--stroke); position:relative;
+}
+footer::before{ content:""; position:absolute; top:-2px; left:0; right:0; height:1px; background:var(--stroke); }
+footer .f-name{ font-family:var(--font-display); font-size:20px; }
+footer .f-meta{ font-family:var(--font-ui); font-size:13px; color:var(--text-muted); letter-spacing:.06em; margin-top:8px; }
+footer .f-honest{ font-size:12px; color:var(--text-muted); margin-top:18px; opacity:.85; }
+
+@media (max-width:680px){
+  .pains,.spaces,.grid2{ grid-template-columns:1fr; }
+  h1{ font-size:34px; }
+}
+</style>
+</head>
+<body data-theme="gold">
+
+<!-- SVG 符号库：植物纹样 + 角饰（currentColor 随主题变色） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 银杏扇叶 -->
+    <symbol id="ico-ginkgo" viewBox="0 0 24 24">
+      <path d="M12 3.5 C8.6 6 6 9 6 12.5 C6 16.2 8.7 19.2 12 19.2 C15.3 19.2 18 16.2 18 12.5 C18 9 15.4 6 12 3.5 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 19.2 V21.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M12 6.5 V15 M12 7.5 C10.2 9 9.2 10.6 9.2 12.2 M12 7.5 C13.8 9 14.8 10.6 14.8 12.2" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+    </symbol>
+    <!-- 蓟花头 -->
+    <symbol id="ico-thistle" viewBox="0 0 24 24">
+      <circle cx="12" cy="8.5" r="4.8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M12 13.3 V21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M7.4 13.8 L5 19.6 M16.6 13.8 L19 19.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M12 3.7 V5.6 M8.6 4.6 L9.3 6.3 M15.4 4.6 L14.7 6.3" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    </symbol>
+    <!-- 鸢尾旗瓣 -->
+    <symbol id="ico-iris" viewBox="0 0 24 24">
+      <path d="M12 5 C7 5 4 8.8 4 13 C4 15.4 5.7 17 8 17 C8 13.2 9 10.2 12 8 C15 10.2 16 13.2 16 17 C18.3 17 20 15.4 20 13 C20 8.8 17 5 12 5 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M12 8 V19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </symbol>
+    <!-- 杜松羽状枝 -->
+    <symbol id="ico-juniper" viewBox="0 0 24 24">
+      <path d="M12 2.5 V21.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M12 5 C9 7 9 9 12 11 M12 5 C15 7 15 9 12 11 M12 9 C9 11 9 13 12 15 M12 9 C15 11 15 13 12 15 M12 13 C9 15 9 17 12 19 M12 13 C15 15 15 17 12 19" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    </symbol>
+    <!-- 忍冬卷涡（花环 / 陪伴） -->
+    <symbol id="ico-honeysuckle" viewBox="0 0 24 24">
+      <path d="M12 12 m -8 0 a 8 8 0 1 1 16 0 a 8 8 0 1 1 -16 0" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M12 4.5 C12 7 10.5 8 10.5 10 C10.5 12 13 12 13 14 C13 16 11.5 17 11.5 19" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M12 4.5 C12 7 13.5 8 13.5 10 C13.5 12 11 12 11 14 C11 16 12.5 17 12.5 19" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </symbol>
+    <!-- 自律（时钟/日课） -->
+    <symbol id="ico-discipline" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M12 6.5 V12 L15.5 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <!-- 卡牌（菱形堆叠） -->
+    <symbol id="ico-cards" viewBox="0 0 24 24">
+      <rect x="8" y="4" width="12" height="15" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M4 7.5 L7 5.5 L13.5 5.5 L13.5 6.5 L7 6.5 L4 8.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M12 14 L14 12 L16 14 L14 16 Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </symbol>
+    <!-- 分隔带中央纹样（对称枝叶） -->
+    <symbol id="divider-plant" viewBox="0 0 48 24">
+      <path d="M24 2 V22" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M24 6 C18 6 15 9 15 13 M24 6 C30 6 33 9 33 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M24 10 C19 10 17 13 17 17 M24 10 C29 10 31 13 31 17" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      <circle cx="24" cy="5" r="1.6" fill="currentColor"/>
+    </symbol>
+    <!-- 角饰：双线 L 框 + 菱形 -->
+    <symbol id="corner" viewBox="0 0 32 32">
+      <path d="M2 30 V12 C2 6 7 2 13 2 H30" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M2 30 V14 C2 9 6 5 11 5 H30" fill="none" stroke="currentColor" stroke-width="1"/>
+      <path d="M9 8 L11 10 L9 12 L7 10 Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- 顶部条 -->
+<div class="topbar">
+  <div class="brand">
+    <svg class="mark" width="20" height="20"><use href="#ico-ginkgo"/></svg>
+    <span>GrowLab · 个人成长实验室</span>
+  </div>
+  <select id="themeSel" class="theme-sel" onchange="setTheme(this.value)" title="切换主题">
+    <option value="gold">🌾 Seder·金</option>
+    <option value="iris">🪻 Seder·鸢尾</option>
+    <option value="pergament">📜 Seder·羊皮纸</option>
+    <option value="distel">🌿 Seder·蓟</option>
+  </select>
+</div>
+
+<div class="wrap">
+
+  <!-- 封面 -->
+  <header class="hero">
+    <div class="rule">TAFEL I · 作品展示</div>
+    <h1>个人成长实验室 <span style="color:var(--brand)">GrowLab</span></h1>
+    <div class="lead" style="font-family:var(--font-display)">不以牺牲身心状态为代价的学习成长 Agent</div>
+    <p class="tagline">一个让学生在<b>安全模拟</b>里练习、在<b>真实行动</b>里验证、逐渐<b>理解自己</b>的 AI 成长产品——它不替你决定，而是陪你把「知道」变成「会用」。</p>
+  </header>
+
+  <div class="divider"><svg><use href="#divider-plant"/></svg></div>
+
+  <!-- 要解决的问题 -->
+  <div class="tafel">TAFEL II · 要解决的问题</div>
+  <h2>大学生常困在三种冲突里，普通 AI 只会「分开给建议」</h2>
+  <div class="pains">
+    <div class="pain frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="big">学习 vs 健康</div>
+      <div class="t">赶作业挤掉吃饭休息</div>
+      <p>助手一边说「要专注学习」一边说「要规律作息」，却无法在同一天里协调二者。</p>
+    </div>
+    <div class="pain frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="big">知道 vs 会用</div>
+      <div class="t">道理都懂，真到事上不会</div>
+      <p>「拒绝邀约」「和家人谈压力」「表达分歧」——缺一个安全的练习场。</p>
+    </div>
+    <div class="pain frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="big">启发 vs 行动</div>
+      <div class="t">聊完很受启发，现实毫无变化</div>
+      <p>缺少把讨论变成真实行动、再回看效果的机制。</p>
+    </div>
+  </div>
+
+  <div class="divider"><svg><use href="#divider-plant"/></svg></div>
+
+  <!-- 方案闭环 -->
+  <div class="tafel">TAFEL III · 我们的方案</div>
+  <h2>一条成长闭环，而不是聊天窗口合集</h2>
+  <p class="lead">它不是「你问我答」，而是一个协调系统——把抽象的成长，落成能练、能回访的小步骤。</p>
+  <div class="loop">
+    <span class="step"><b>探索</b></span><span class="arrow">→</span>
+    <span class="step"><b>模拟</b></span><span class="arrow">→</span>
+    <span class="step"><b>行动</b></span><span class="arrow">→</span>
+    <span class="step"><b>反馈</b></span><span class="arrow">→</span>
+    <span class="step"><b>理解自己</b></span><span class="arrow">→</span>
+    <span class="step core"><b>调整下一次</b></span>
+  </div>
+
+  <div class="spaces">
+    <div class="space frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="head"><svg class="ico"><use href="#ico-juniper"/></svg><div><div class="nm">探索空间</div><div class="en">Explore</div></div></div>
+      <p>把「迷茫」变成几个可试的方向，不上来就贴标签、不下定论。</p>
+      <span class="loop-tag">闭环 · 探索</span>
+    </div>
+    <div class="space frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="head"><svg class="ico"><use href="#ico-iris"/></svg><div><div class="nm">情境剧场</div><div class="en">Theater</div></div></div>
+      <p>在关系 / 健康情境里对话，关键节点可「换一种说法」分支重演。</p>
+      <span class="loop-tag">闭环 · 模拟</span>
+    </div>
+    <div class="space frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="head"><svg class="ico"><use href="#ico-thistle"/></svg><div><div class="nm">个人实验室</div><div class="en">Lab</div></div></div>
+      <p>把模拟收获变成现实小实验（假设 / 动作 / 回访），落地再复盘。</p>
+      <span class="loop-tag">闭环 · 行动 → 反馈</span>
+    </div>
+    <div class="space frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="head"><svg class="ico"><use href="#ico-ginkgo"/></svg><div><div class="nm">成长档案</div><div class="en">Archive</div></div></div>
+      <p>可编辑、可删除的成长记忆，每条都有出处。</p>
+      <span class="loop-tag">闭环 · 理解自己</span>
+    </div>
+    <div class="space frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="head"><svg class="ico"><use href="#ico-honeysuckle"/></svg><div><div class="nm">成长宠物</div><div class="en">Companion</div></div></div>
+      <p>真实学习行动喂养它成长，照顾它吃饭 / 睡觉 / 玩耍，全程陪伴。</p>
+      <span class="loop-tag">闭环 · 陪伴与动机</span>
+    </div>
+    <div class="space frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="head"><svg class="ico"><use href="#ico-discipline"/></svg><div><div class="nm">自律打卡</div><div class="en">Discipline</div></div></div>
+      <p>每日目标清单、专注计时、近 30 天热力图——执行层支撑。</p>
+      <span class="loop-tag">支撑空间</span>
+    </div>
+  </div>
+  <p class="support">另有 <b>成长卡牌</b>（塔罗式收集 + 抽卡）作为彩蛋层 · 全部导航均为真实功能，无占位页</p>
+
+  <div class="divider"><svg><use href="#divider-plant"/></svg></div>
+
+  <!-- 演示例子 -->
+  <div class="tafel">TAFEL IV · 一个打动人的例子</div>
+  <h2>阿杰深夜邀你打游戏，你想守住 23:30 睡觉，又不想伤感情</h2>
+  <div class="demo frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+    <div class="scene-label">情境剧场 · 分支重演</div>
+    <div class="chat">
+      <div class="msg they"><span class="who">阿杰 · 22:50</span>「开黑吗？三缺一，就差你了！」</div>
+      <div class="msg me"><span class="who">你 · 第一遍</span>「改天吧，明天有考试。」</div>
+    </div>
+    <div class="branch">▲ 结果 A · 关系无损</div>
+    <div class="chat">
+      <div class="msg me"><span class="who">你 · 重演</span>「烦死了，别烦我。」</div>
+      <div class="msg they"><span class="who">阿杰 · 反应</span>「……行吧。」</div>
+    </div>
+    <div class="branch">▲ 结果 B · 底线守住了，但阿杰觉得被冷落</div>
+    <div class="insight">
+      <div class="lab">Agent 对比复盘 · 关键洞察</div>
+      <p>「A 拒绝的是时间，B 拒绝的是人。」</p>
+      <span class="sub">再把这条收获变成现实小实验：下次拒绝时「说感受 + 给替代方案」，回访效果。不是给你标准答案，而是让你亲身体会不同选择的不同后果。</span>
+    </div>
+  </div>
+
+  <div class="divider"><svg><use href="#divider-plant"/></svg></div>
+
+  <!-- 技术实现 + 边界 -->
+  <div class="tafel">TAFEL V · 技术实现 &amp; 诚实边界</div>
+  <div class="grid2">
+    <div class="kv frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="k">技术要点</div>
+      <ul class="check">
+        <li>Python FastAPI + SQLite（单文件、可携带、可追溯）</li>
+        <li>DeepSeek 驱动对话推进、评估、分支对比、实验计划</li>
+        <li>单页应用，新艺术运动（Art Nouveau）视觉风格</li>
+        <li>Agent 每次输入 / 输出全部落库可追溯</li>
+        <li>「确认前置、可撤销」「未知不结算」——不伪造数据</li>
+      </ul>
+    </div>
+    <div class="kv frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+      <div class="k">健康安全与隐私边界</div>
+      <ul class="check">
+        <li>不诊断、不治疗、不人格评分、不减肥 / 训练处方</li>
+        <li>情境角色反应只是模拟，不代表真人</li>
+        <li>红旗词（自伤 / 严重不适）→ 转介专业支持</li>
+        <li>敏感自述默认最小化收集、可删除</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="status frame"><span class="corners"><svg class="tl"><use href="#corner"/></svg><svg class="tr"><use href="#corner"/></svg><svg class="br"><use href="#corner"/></svg><svg class="bl"><use href="#corner"/></svg></span>
+    <h3 style="color:var(--brand)">现状与下一步</h3>
+    <div class="row"><span class="s">✅</span> 完整闭环已端到端跑通（真实模型调用）</div>
+    <div class="row"><span class="s">⏳</span> 待做：更大规模真实试用 · 竞品对比 · 长期效果验证</div>
+    <div class="row"><span class="s">⚠️</span> 短期测试如实标注，未声称改善身心健康</div>
+  </div>
+
+  <footer>
+    <div class="f-name">个人成长实验室 · GrowLab</div>
+    <div class="f-meta">中山大学 · 理学院 · 数学专业本科一年级 · 单人团队</div>
+    <div class="f-meta" style="margin-top:4px">大学生 OPC 创新创业 · AI Agent 赛道</div>
+    <div class="f-honest">本页为作品展示 · 产品假设如实标注 · 不含真实用户隐私数据</div>
+  </footer>
+
+</div>
+
+<script>
+function setTheme(v){
+  var b = document.body;
+  if(!v || v === 'light'){ b.removeAttribute('data-theme'); }
+  else { b.setAttribute('data-theme', v); }
+  try{ localStorage.setItem('growlab-showcase-theme', v); }catch(e){}
+}
+(function(){
+  try{
+    var t = localStorage.getItem('growlab-showcase-theme');
+    if(t){ setTheme(t); var s = document.getElementById('themeSel'); if(s) s.value = t; }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
