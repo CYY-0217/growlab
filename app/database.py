@@ -273,6 +273,12 @@ def init_db(conn: sqlite3.Connection):
     if "director" not in cols2:
         conn.execute("ALTER TABLE scene_runs ADD COLUMN director TEXT DEFAULT '{}'")
         conn.commit()
+    # 迁移：goals / schedule_items 补 tags 列（3X3 标签能力）
+    for _t in ("goals", "schedule_items"):
+        _c = [r[1] for r in conn.execute(f"PRAGMA table_info({_t})")]
+        if "tags" not in _c:
+            conn.execute(f"ALTER TABLE {_t} ADD COLUMN tags TEXT DEFAULT ''")
+            conn.commit()
 
 
 def now_iso() -> str:
@@ -1338,3 +1344,13 @@ def list_metrics(user_id: int, date: str | None = None,
         args.append(dimension)
     q += " ORDER BY date DESC, id DESC"
     return [dict(r) for r in get_conn().execute(q, args)]
+
+
+def set_goal_tags(goal_id: int, tags: str):
+    get_conn().execute("UPDATE goals SET tags=? WHERE id=?", (tags, goal_id))
+    get_conn().commit()
+
+
+def set_schedule_tags(item_id: int, tags: str):
+    get_conn().execute("UPDATE schedule_items SET tags=? WHERE id=?", (tags, item_id))
+    get_conn().commit()

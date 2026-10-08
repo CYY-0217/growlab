@@ -195,9 +195,30 @@ def _timeline_text(timeline: list, character_name: str) -> str:
     return "\n".join(lines)
 
 
+def _mood_text(timeline: list, character_name: str) -> str:
+    """把累计的关系温度讲给模型听，让情绪跨轮次连续演化。"""
+    mood = ""
+    delta = 0
+    for t in timeline:
+        ev = t.get("eval") or {}
+        if t.get("speaker") != "user":
+            continue
+        if ev.get("character_mood"):
+            mood = ev["character_mood"]
+        try:
+            delta += int(ev.get("relation_delta") or 0)
+        except (TypeError, ValueError):
+            pass
+    if not mood and delta == 0:
+        return "（刚开始，对方情绪中性）"
+    label = "偏高（对你有好感）" if delta > 0 else ("偏低（对你有点不满）" if delta < 0 else "中性")
+    cur = f"对方此刻情绪：{mood}" if mood else "对方情绪：中性"
+    return f"{cur}；目前关系温度累计 {delta:+d}（{label}）。请保持情绪的连续性，不要凭空重置。"
+
+
 def scene_character(scenario: dict, timeline: list, user_text: str,
                     node: dict, director: dict | None = None) -> dict:
-    """角色回应 + 隐藏评估。用户文本命中红旗词时返回转介，不调用模型。"""
+    """角色回应 + 隐藏评估 + 情绪变化。用户文本命中红旗词时返回转介，不调用模型。"""
     flag = check_red_flags(user_text)
     if flag:
         return {"red_flag": True, "message": flag, "eval": {}}
@@ -214,6 +235,7 @@ def scene_character(scenario: dict, timeline: list, user_text: str,
         user_role=scenario["user_role"], goal=scenario["goal"],
         constraints_text=constraints_text,
         focus=focus, intensity=intensity,
+        mood_text=_mood_text(timeline, scenario["character_name"]),
         node_prompt=node.get("prompt", ""),
         timeline_text=_timeline_text(timeline, scenario["character_name"]),
         user_text=user_text)
@@ -221,6 +243,12 @@ def scene_character(scenario: dict, timeline: list, user_text: str,
     parsed = _parse_json(raw)
     database.save_agent_output(None, "scene_character", user_text, raw)
     if parsed and "character_reply" in parsed:
+        # 情绪字段缺省兜底：缺了不报错，只是本轮温度计不动
+        parsed.setdefault("character_mood", "")
+        try:
+            parsed["relation_delta"] = max(-2, min(2, int(parsed.get("relation_delta") or 0)))
+        except (TypeError, ValueError):
+            parsed["relation_delta"] = 0
         return parsed
     return {"character_reply": raw, "eval": {}, "parse_error": True, "raw": raw}
 
@@ -244,6 +272,29 @@ def scene_compare(scenario: dict, branches: list[dict],
         branches_text="\n".join(lines))
     raw = _chat(prompts.SCENE_COMPARE_SYSTEM, user_prompt)
     database.save_agent_output(None, "scene_compare",
+                               scenario["title"], raw)
+    return raw
+
+
+def scene_insight(scenario: dict, branches: list[dict]) -> str:
+    """跨分支成长洞察：通读用户所有练习表现，指出行为模式。markdown 文本。"""
+    lines = []
+    for b in branches:
+        ev = b.get("eval", {})
+        mood = b.get("character_mood") or ""
+        lines.append(
+            f"- 分支{b.get('branch_label', '')}·{b.get('node_label', '')}："
+            f"用户说「{b.get('user_text', '')}」"
+            f"→ {scenario['character_name']}回应「{b.get('character_reply', '')}」"
+            f"（情绪：{mood or '未记录'}）"
+            f"→ 评估：达成目标={ev.get('达成目标')} 关系友好={ev.get('关系友好')} "
+            f"真诚表达={ev.get('真诚表达')}")
+    user_prompt = prompts.SCENE_INSIGHT_USER.format(
+        title=scenario["title"], goal=scenario["goal"],
+        success_criteria=scenario.get("success_criteria", ""),
+        branches_text="\n".join(lines))
+    raw = _chat(prompts.SCENE_INSIGHT_SYSTEM, user_prompt)
+    database.save_agent_output(None, "scene_insight",
                                scenario["title"], raw)
     return raw
 
@@ -412,3 +463,41 @@ def adjust_conflict(user_id: int, op: dict) -> dict:
     if parsed and "candidates" in parsed:
         return parsed
     return {"candidates": [], "note": "", "parse_error": True, "raw": raw}
+
+
+def auto_plan(user: dict, content: str) -> dict:
+    """内容 → 自动排成日程 + 待办（预览，不写库）。"""
+    goals = database.list_goals(user["id"])
+    user_prompt = prompts.AUTO_PLAN_USER.format(
+        profile=_profile_text(user), date_ref=_date_ref_text(),
+        goals_text=_goals_text(goals), content=content)
+    raw = _chat(prompts.AUTO_PLAN_SYSTEM, user_prompt)
+    parsed = _parse_json(raw)
+    database.save_agent_output(user["id"], "auto_plan", content, raw)
+    if parsed:
+        return {"schedule": parsed.get("schedule", []),
+                "todos": parsed.get("todos", []),
+                "note": parsed.get("note", "")}
+    return {"schedule": [], "todos": [], "note": "",
+            "parse_error": True, "raw": raw}
+
+
+def review(user: dict, days: int = 7) -> str:
+    """最近 N 天的计划 vs 实际复盘。"""
+    tl = []
+    for i in range(days):
+        d = (date.today() - timedelta(days=days - 1 - i)).isoformat()
+        sched = database.list_schedule(user["id"], d)
+        row = database.get_conn().execute(
+            "SELECT focus_min FROM daily_entries WHERE user_id=? AND entry_date=?",
+            (user["id"], d)).fetchone()
+        focus = (row["focus_min"] or 0) if row else 0
+        done = sum(1 for s in sched if s["status"] == "done")
+        tl.append({"date": d, "planned": len(sched), "done": done,
+                   "focus_min": focus, "titles": [s["title"] for s in sched]})
+    user_prompt = prompts.REVIEW_USER.format(
+        profile=_profile_text(user), days=days,
+        timeline_json=json.dumps(tl, ensure_ascii=False))
+    raw = _chat(prompts.REVIEW_SYSTEM, user_prompt)
+    database.save_agent_output(user["id"], "review", f"近{days}天复盘", raw)
+    return raw

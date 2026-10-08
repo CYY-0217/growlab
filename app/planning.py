@@ -228,3 +228,35 @@ def revert_op(user_id: int, snapshot: dict) -> dict:
                 checks[snapshot["goal_id"]] = snapshot["old_value"]
             database.upsert_daily_entry(user_id, snapshot["date"], checkins=checks)
     return {"ok": True}
+
+
+def apply_auto_plan(user_id: int, schedule: list, todos: list, tags: str = "") -> dict:
+    """应用自动排程：写 schedule_items + goals，同名自动关联，可选统一打标签。"""
+    gid_map = {}
+    n_goal = n_sched = 0
+    for t in todos:
+        title = (t.get("title") or "").strip()
+        if not title:
+            continue
+        gid = database.add_goal(user_id, title, weight=3)
+        if tags:
+            database.set_goal_tags(gid, tags)
+        gid_map[title] = gid
+        n_goal += 1
+    for s in schedule:
+        title = (s.get("title") or "").strip()
+        date = (s.get("date") or "").strip()
+        if not title or not date:
+            continue
+        gid = gid_map.get(title)
+        if not gid:
+            gid = database.add_goal(user_id, title, weight=3)
+            gid_map[title] = gid
+            n_goal += 1
+        sid = database.add_schedule_item(
+            user_id, title, date, s.get("start_time", ""), s.get("end_time", ""),
+            int(s.get("duration_min") or 0), gid, "agent")
+        if tags:
+            database.set_schedule_tags(sid, tags)
+        n_sched += 1
+    return {"goals": n_goal, "schedule": n_sched}

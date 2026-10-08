@@ -146,6 +146,23 @@ label{font-size:12px;color:var(--muted);display:block;margin:8px 0 3px}
 .badge.ok{color:var(--success);border-color:var(--success)}
 .badge.no{color:var(--danger);border-color:var(--danger)}
 
+/* ===== 关系温度计 / 情绪 / 对比表 / 成长洞察 ===== */
+.relpanel{display:flex;gap:10px;align-items:center;padding:9px 14px;border:1px solid var(--border);
+  border-radius:12px;background:var(--surface-2);margin:10px 0;flex-wrap:wrap}
+.relpanel .face{font-size:22px;line-height:1}
+.relbar{flex:1;min-width:130px;height:8px;border-radius:6px;background:var(--surface);
+  border:1px solid var(--border);position:relative}
+.relbar .relmark{position:absolute;top:-3px;bottom:-3px;left:50%;width:1px;background:var(--muted);opacity:.5}
+.relbar .fill{position:absolute;top:0;bottom:0;background:var(--gold);border-radius:6px;
+  transition:left .5s var(--ease),width .5s var(--ease),background .5s}
+.mood-chip{font-size:12px;padding:3px 10px;border-radius:14px;border:1px dashed var(--gold);color:var(--rust)}
+.eval-note{flex-basis:100%;font-size:11px;color:var(--muted)}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+.cmp-table th,.cmp-table td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+.cmp-table th{color:var(--rust);background:var(--surface-2);font-weight:600;white-space:nowrap}
+.insight-box{border:1px solid var(--gold);border-radius:12px;padding:4px 16px;margin-top:10px;
+  background:linear-gradient(135deg,rgba(200,155,90,.10),transparent 60%)}
+
 .md{background:var(--surface-2);border-radius:12px;padding:14px 16px;font-size:13px;
   white-space:pre-wrap;line-height:1.65;border:1px solid var(--border)}
 .md h1,.md h2,.md h3{font-size:15px;margin:8px 0 4px;color:var(--rust)}
@@ -323,17 +340,24 @@ button.act,nav button,.usertag,.dir-opt,.habit,.list-item,.spec-card{
   transition:border-color .2s,color .2s,background .2s,transform .16s var(--ease)}
 button.act:active,nav button:active,.usertag:active,.dir-opt:active{transform:scale(.96)}
 .spec-card:hover{transform:translateY(-3px)}
-@media(prefers-reduced-motion:reduce){#main.view-anim>*{animation:none}}
+@media(prefers-reduced-motion:reduce){
+  #main.view-anim>*{animation:none}
+  .card-enter,.sec.arrive .sec-h .sh-ico,.sec.arrive .sec-h::after,
+  .sec.page-next,.sec.page-prev,
+  #nav button.bento.on .b-ico{animation:none}
+  .sec-h,.sec-body{transition:none}
+}
 
 /* ===== Bento 空间网格（首页启动器 · 参考 saaspo/supahero） ===== */
 #nav{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0 20px}
 #nav button.bento{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
   gap:5px;text-align:left;padding:14px 15px;border:1px solid var(--border);border-radius:14px;
   background:var(--surface);color:var(--text);cursor:pointer;min-height:96px;
-  transition:transform .18s var(--ease),border-color .2s,box-shadow .2s}
+  transition:transform .18s var(--ease),border-color .25s,box-shadow .25s,background-color .25s}
 #nav button.bento:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:var(--shadow)}
 #nav button.bento.on{background:var(--surface);color:var(--text);border-color:var(--gold);
   box-shadow:0 0 0 2px var(--gold-2)}
+#nav button.bento.on .b-ico{animation:bloom .55s var(--ease)}
 #nav .b-ico{font-size:24px;line-height:1}
 #nav .b-t{font-size:15px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
 #nav .b-d{font-size:11.5px;color:var(--muted);line-height:1.45}
@@ -392,6 +416,13 @@ h1 .fl{font-size:16px}
 /* 日程 + 量化 */
 #plan_schedule{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 .sched-day-h{font-size:12px;color:var(--rust);letter-spacing:.06em;margin:10px 0 4px;font-weight:600}
+.sched-tag{font-size:10px;color:var(--rust);border:1px solid var(--rust);border-radius:8px;padding:0 6px;margin-left:4px}
+.timeline-row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:12px}
+.tl-date{width:44px;color:var(--muted);white-space:nowrap}
+.tl-bar{flex:1;height:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.tl-fill{display:block;height:100%;background:linear-gradient(90deg,var(--gold-2),var(--gold))}
+.tl-num{width:40px;text-align:right;color:var(--text)}
+.tl-focus{width:56px;text-align:right;color:var(--rust);white-space:nowrap}
 .sched-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border:1px solid var(--border);
   border-radius:9px;background:var(--surface-2);animation:rise .35s var(--ease) both}
 .sched-item.cancelled{opacity:.5;text-decoration:line-through}
@@ -418,9 +449,47 @@ h1 .fl{font-size:16px}
 .sec-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.6}
 .sec-h,.sec-body{opacity:0;transform:translateY(26px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
 .sec.in .sec-h,.sec.in .sec-body{opacity:1;transform:none}
+
+/* ===== 换页流动感 ===== */
+/* 到达：导航跳转后，目标区图标绽放 + 金线画出 + 内容重升一次 */
+.sec.arrive .sec-h .sh-ico{animation:bloom .65s var(--ease)}
+.sec.arrive .sec-h::after{transform-origin:left;animation:drawline .7s var(--ease)}
+@keyframes bloom{
+  0%{transform:scale(.5) rotate(-10deg);opacity:.3}
+  60%{transform:scale(1.16) rotate(4deg)}
+  100%{transform:none;opacity:1}}
+@keyframes drawline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+/* 多步视图换页：卡片轻浮入场，逐张错峰（animationDelay 由 JS 按序号设置） */
+.card-enter{animation:cardIn .45s var(--ease) both}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:none}}
+
+/* ===== 分页模式：一次一个空间 ===== */
+.sec{display:none}
+.sec.active{display:block}
+.sec.page-next{animation:pageInNext .42s var(--ease)}
+.sec.page-prev{animation:pageInPrev .42s var(--ease)}
+@keyframes pageInNext{from{opacity:0;transform:translateX(38px)}to{opacity:1;transform:none}}
+@keyframes pageInPrev{from{opacity:0;transform:translateX(-38px)}to{opacity:1;transform:none}}
+/* 进入空间后：页头收窄，八宫格变紧凑分页条 */
+body.page-mode header{margin-bottom:4px}
+body.page-mode header .hdr-orn,body.page-mode header .sub{display:none}
+body.page-mode h1{font-size:20px;letter-spacing:2px;cursor:pointer;transition:color .2s}
+body.page-mode h1:hover{color:var(--gold)}
+body.page-mode h1 .fl{display:none}
+body.page-mode .orn-divider{display:none}
+body.page-mode .userselect{margin:2px 0 10px}
+body.page-mode #nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+body.page-mode #nav .bento{flex:0 0 auto;flex-direction:row;align-items:center;gap:7px;
+  min-height:0;padding:7px 13px;border-radius:999px}
+body.page-mode #nav .bento .b-ico{font-size:16px}
+body.page-mode #nav .bento .b-t{font-size:13px}
+body.page-mode #nav .bento .b-d,body.page-mode #nav .bento .b-tag{display:none}
+body.page-mode #nav .bento.on{box-shadow:0 0 0 1.5px var(--gold-2)}
 </style>
 </head>
-<body>
+<body data-view="home">
 <div class="bg" id="bg"></div>
 <div class="wrap">
   <header>
@@ -442,7 +511,7 @@ h1 .fl{font-size:16px}
         <circle r="2.2" fill="currentColor"/>
       </g>
     </svg>
-    <h1>个人成长实验室<span class="fl">Art&nbsp;Nouveau</span></h1>
+    <h1 onclick="showView('home')" title="返回启动台">个人成长实验室<span class="fl">Art&nbsp;Nouveau</span></h1>
     <div class="sub hero-lead">不以牺牲身心状态为代价的学习成长 Agent</div>
     <div class="sub loop-line">探索 → 模拟 → 行动 → 反馈 → 理解自己</div>
   </header>
@@ -647,25 +716,55 @@ function renderAll(){
   renderPlan(); renderTheater(); renderDiscipline(); renderExplore();
   renderLab(); renderMemory(); renderPet(); renderCards();
 }
+/* —— 分页模式：一次一个空间，方向感知翻页 —— */
+const VIEW_ORDER=['plan','theater','discipline','explore','lab','memory','pet','cards'];
 function showView(v){
-  const sec=document.getElementById('sec-'+v);
-  if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'});
+  const cur=document.querySelector('#main .sec.active');
+  const next=v==='home'?null:document.getElementById('sec-'+v);
+  if(v!=='home'&&!next)return;
+  let dir='page-next';
+  if(cur&&next&&cur!==next){
+    dir=VIEW_ORDER.indexOf(v)>=VIEW_ORDER.indexOf(cur.dataset.view)?'page-next':'page-prev';
+  }
+  if(cur)cur.classList.remove('active','page-next','page-prev','arrive');
+  document.body.classList.toggle('page-mode',v!=='home');
+  document.body.dataset.view=v;
+  if(next){
+    next.classList.add('active');
+    next.classList.remove('page-next','page-prev','arrive');void next.offsetWidth;
+    next.classList.add(dir,'arrive');
+  }
+  document.querySelectorAll('#nav .bento').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+  window.scrollTo(0,0);
+}
+// 键盘 ←/→ 翻页（输入框聚焦时不抢键）
+window.addEventListener('keydown',e=>{
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  const i=VIEW_ORDER.indexOf(document.body.dataset.view);
+  if(i<0)return;
+  if(e.key==='ArrowRight'&&i<VIEW_ORDER.length-1)showView(VIEW_ORDER[i+1]);
+  if(e.key==='ArrowLeft'&&i>0)showView(VIEW_ORDER[i-1]);
+});
+function initFlow(){
+  // 多步视图（剧场/探索/规划）换页时，卡片轻浮入场 + 错峰；
+  // 打卡/萌宠这类频繁重渲染的区不挂，避免闪烁。
+  ['theater','explore','plan'].forEach(v=>{
+    const b=secBody(v);
+    if(!b)return;
+    new MutationObserver(()=>{
+      b.querySelectorAll(':scope > .card').forEach((c,i)=>{
+        c.classList.remove('card-enter');void c.offsetWidth;
+        c.style.animationDelay=(i*0.07)+'s';
+        c.classList.add('card-enter');
+      });
+    }).observe(b,{childList:true});
+  });
 }
 function initScroll(){
-  if('IntersectionObserver' in window){
-    const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});},{rootMargin:'0px 0px -10% 0px',threshold:0.05});
-    document.querySelectorAll('#main .sec').forEach(s=>io.observe(s));
-  }else{
-    document.querySelectorAll('#main .sec').forEach(s=>s.classList.add('in'));
-  }
-  window.addEventListener('scroll',onScrollSpy,{passive:true});
-  onScrollSpy();
-}
-function onScrollSpy(){
-  let curSec='plan';
-  const y=window.scrollY + window.innerHeight*0.3;
-  document.querySelectorAll('#main .sec').forEach(s=>{ if(s.offsetTop<=y) curSec=s.dataset.view; });
-  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.view===curSec));
+  // 分页模式下没有滚动显现，标题/内容直接可见
+  document.querySelectorAll('#main .sec').forEach(s=>s.classList.add('in'));
+  initFlow();
 }
 
 // ---------- 探索空间 ----------
@@ -745,15 +844,17 @@ async function renderTheater(){
       <button class="act primary" onclick="showCreateScene()">＋ 自创一个场景</button>
     </div>`;
   try{
-    const scenes=await apiGet('/api/scenarios');
+    const scenes=await apiGet('/api/scenarios?user_id='+cur);
     scenes.forEach(s=>{
       const isCustom=(s.slug||'').startsWith('custom-');
       const del=isCustom?`<span class="badge no" onclick="event.stopPropagation();delScene('${esc(s.slug)}')">删除</span>`:'';
+      const played=s.run_count?`<span class="muted">已练 ${s.run_count} 场</span>`:'';
+      const insight=s.run_count?`<span class="badge ok" onclick="event.stopPropagation();insightScene('${esc(s.slug)}','${esc(s.title)}')">🔮 成长洞察</span>`:'';
       h+=`<div class="scene" onclick="openDirector('${esc(s.slug)}')">
       <div class="avatar">${esc(s.avatar||'🧑')}</div>
       <div class="grow"><div class="t">${esc(s.title)}</div>
       <div class="m">${esc(s.theme)} · ${esc(s.goal)}</div></div>
-      ${del}<span class="badge ok">进入</span></div>`;
+      ${played}${insight}${del}<span class="badge ok">进入</span></div>`;
     });
   }catch(e){h+=`<div class="muted">场景加载失败：${esc(e.message)}</div>`;}
   h+=`</div>`;
@@ -827,8 +928,30 @@ async function createScene(){
 }
 async function startScene(slug,director){
   const r=await api(`/api/scenes/${slug}/start`,{user_id:cur,director:director||null});
-  curScene=r.scenario;curRun={id:r.run_id,branch:'A',node:r.current_node_id,tl:[],director:r.director||{}};
+  curScene=r.scenario;curRun={id:r.run_id,branch:'A',node:r.current_node_id,tl:[],director:r.director||{},evals:[],delta:0,mood:''};
   renderScenePlay();
+}
+function relState(delta){
+  if(delta<=-4)return{face:'🥶',label:'关系冰冷'};
+  if(delta<0)return{face:'😕',label:'关系紧张'};
+  if(delta===0)return{face:'😐',label:'关系平静'};
+  if(delta<=3)return{face:'🙂',label:'关系融洽'};
+  return{face:'😄',label:'关系热络'};
+}
+function updateRelPanel(){
+  const panel=document.getElementById('relPanel');
+  if(!panel)return;
+  const d=Math.max(-6,Math.min(6,curRun.delta||0));
+  const st=relState(d);
+  document.getElementById('relFace').textContent=st.face;
+  const fill=document.getElementById('relFill');
+  const pct=Math.abs(d)/6*50;
+  fill.style.left=d>=0?'50%':(50-pct)+'%';
+  fill.style.width=pct+'%';
+  fill.style.background=d<0?'var(--rust)':'var(--gold)';
+  const moodEl=document.getElementById('relMood');
+  const name=curScene?curScene.character_name:'对方';
+  moodEl.textContent=(curRun.mood?`${name}此刻：${curRun.mood} · `:'')+st.label+`（${d>0?'+':''}${d}）`;
 }
 function renderScenePlay(){
   const s=curScene;
@@ -847,6 +970,11 @@ function renderScenePlay(){
     <div class="muted"><b>你的目标：</b>${esc(s.goal)}</div>
     <div class="muted"><b>约束：</b>${esc((s.constraints||[]).join('；'))}</div>
     ${curRun.director&&curRun.director.focus?`<div class="muted"><b>训练设置：</b>${esc(curRun.director.focus)} · ${esc(curRun.director.intensity)} · ${esc(curRun.director.feedback)}</div>`:''}
+    <div class="relpanel" id="relPanel">
+      <span class="face" id="relFace">😐</span>
+      <div class="relbar"><div class="relmark"></div><div class="fill" id="relFill" style="left:50%;width:0%"></div></div>
+      <span class="mood-chip" id="relMood">刚开始对话</span>
+    </div>
     <div class="chat">${chat||'<div class="muted">场景开始…</div>'}</div>
     <div id="evalBox" class="eval"></div>`;
   if(done){
@@ -867,11 +995,13 @@ function renderScenePlay(){
   }
   h+=`<div id="cmpBox" style="margin-top:10px"></div></div>`;
   secBody('theater').innerHTML=h;
+  updateRelPanel();
   const fb=(curRun.director||{}).feedback;
   if(done && fb==='结束后再看' && (curRun.evals||[]).length){
     const eb=document.getElementById('evalBox');
     if(eb) eb.innerHTML=`<div class="muted" style="flex-basis:100%">本场评估 · 训练目标：${esc((curRun.director||{}).focus||'')}</div>`
-      +curRun.evals.map(evalBadgeHTML).join('');
+      +curRun.evals.map(evalBadgeHTML).join('')
+      +`<span class="eval-note">以上评估与情绪均为模型对模拟对话的判断，仅供参考，不是客观评分。</span>`;
   }
 }
 function evalBadgeHTML(ev){
@@ -892,17 +1022,20 @@ async function advanceScene(){
   if(r.red_flag){curRun.tl.push({who:'char',text:r.message});renderScenePlay();return;}
   curRun.tl.push({who:'char',text:r.character_reply});
   curRun.node=r.next_node_id||'';
+  curRun.delta=(curRun.delta||0)+(r.relation_delta||0);
+  if(r.character_mood)curRun.mood=r.character_mood;
   curRun.evals=curRun.evals||[];
   if(r.eval&&Object.keys(r.eval).length)curRun.evals.push(r.eval);
   renderScenePlay();
   const immediate=((curRun.director||{}).feedback||'结束后再看')==='过程中提示';
   if(immediate&&r.eval&&Object.keys(r.eval).length){
-    document.getElementById('evalBox').innerHTML=evalBadgeHTML(r.eval);
+    document.getElementById('evalBox').innerHTML=evalBadgeHTML(r.eval)
+      +`<span class="eval-note">模型对模拟对话的判断，仅供参考。</span>`;
   }
 }
 async function replayScene(){
   const r=await api(`/api/scenes/run/${curRun.id}/replay`);
-  curRun={id:r.run_id,branch:r.branch_label,node:r.current_node_id,tl:[],director:r.director||(curRun&&curRun.director)||{},evals:[]};
+  curRun={id:r.run_id,branch:r.branch_label,node:r.current_node_id,tl:[],director:r.director||(curRun&&curRun.director)||{},evals:[],delta:0,mood:''};
   renderScenePlay();
 }
 async function compareScene(){
@@ -912,11 +1045,52 @@ async function compareScene(){
   catch(e){ document.getElementById('cmpBox').innerHTML=`<div class="muted">对比失败：${esc(e.message)}</div>`; return; }
   if(r.error){document.getElementById('cmpBox').innerHTML=`<div class="muted">${esc(r.error)}</div>`;return;}
   lastCompare=r.compare;
-  document.getElementById('cmpBox').innerHTML=`<div class="md">${fmtMd(r.compare)}</div>
+  document.getElementById('cmpBox').innerHTML=`
+    <div class="section-t">🪞 分支对照</div>${cmpTableHTML(r.branches)}
+    <div class="insight-box"><div class="section-t">⚖ Agent 对比洞察</div>
+      <div class="md">${fmtMd(r.compare)}</div></div>
     <div class="row" style="margin-top:8px">
       <button class="act primary" onclick="makeExperiment()">🧪 变成现实小实验</button>
       <button class="act" onclick="collectExperience()">🃏 收藏经验</button>
+      <button class="act" onclick="insightScene(curScene.slug,curScene.title)">🔮 成长洞察</button>
     </div>`;
+}
+function cmpTableHTML(branches){
+  if(!branches||!branches.length)return '';
+  let h=`<table class="cmp-table"><tr><th>分支</th><th>你的说法</th><th>对方反应</th><th>对方情绪</th><th>评估</th></tr>`;
+  branches.forEach(b=>{
+    const ev=b.eval||{};
+    h+=`<tr><td>${esc(b.label)}</td><td>「${esc(b.user_text)}」</td>
+      <td>${esc(b.character_reply)}</td><td>${esc(b.character_mood||'—')}</td>
+      <td>${ev['达成目标']?'✅':'❌'} ${ev['关系友好']?'✅':'❌'} ${ev['真诚表达']?'✅':'❌'}</td></tr>`;
+  });
+  return h+`</table><div class="eval-note">✅/❌ 为模型对模拟对话的判断，仅供参考；对方反应是模拟练习材料，不代表真人一定如此。</div>`;
+}
+let lastInsight='';
+async function insightScene(slug,title){
+  secBody('theater').innerHTML=`<div class="card">
+    <div class="section-t">🔮 成长洞察 · ${esc(title)}</div>
+    <div class="muted">正在通读你在「${esc(title)}」里的所有练习表现…</div></div>`;
+  let r;
+  try{ r=await api(`/api/scenes/${slug}/insight`,{user_id:cur}); }
+  catch(e){ secBody('theater').innerHTML=`<div class="card"><div class="muted">洞察失败：${esc(e.message)}</div>
+    <div class="row" style="margin-top:8px"><button class="act" onclick="renderTheater()">← 返回</button></div></div>`; return; }
+  if(r.error){ secBody('theater').innerHTML=`<div class="card"><div class="muted">${esc(r.error)}</div>
+    <div class="row" style="margin-top:8px"><button class="act" onclick="renderTheater()">← 返回场景列表</button></div></div>`; return; }
+  lastInsight=r.insight;
+  secBody('theater').innerHTML=`<div class="card">
+    <div class="section-t">🔮 成长洞察 · ${esc(title)}</div>
+    <div class="muted" style="margin-bottom:8px">基于你 ${r.branches} 次关键表现的模式分析。结论只是假设：模拟练习 ≠ 现实表现，不评判人格。</div>
+    <div class="md">${fmtMd(r.insight)}</div>
+    <div class="row" style="margin-top:10px">
+      <button class="act primary" onclick="saveInsight()">📜 存入成长档案</button>
+      <button class="act" onclick="renderTheater()">← 返回场景列表</button>
+    </div></div>`;
+}
+async function saveInsight(){
+  const r=await api('/api/memory',{user_id:cur,kind:'insight',content:lastInsight,source_ref:'theater:'+(curScene?curScene.title:'')});
+  if(r.error)return alert(r.error);
+  alert('已存入成长档案（可编辑、可删除）');
 }
 async function makeExperiment(){
   const r=await api(`/api/scenes/${curScene.slug}/experiment-plan`,{user_id:cur,compare_text:lastCompare});
@@ -957,20 +1131,23 @@ function todayISO(){return fmtDate(new Date());}
 async function renderPlan(){
   const h=`<div class="card">
     <div class="section-t">规划 · 学业与身心平衡</div>
-    <div class="muted" style="margin-bottom:8px">一句话说今天的安排或状态，AI 拆成可确认的操作。确认前不写入，写入了也能撤销。</div>
+    <div class="muted" style="margin-bottom:8px">一句话安排——「解析」拆单条操作；「自动排程」把整段内容排成未来几天的日程+待办并自动关联。确认前不写入。</div>
     <div class="plan-input">
-      <textarea id="plan_text" placeholder="例：明天早上背单词，晚上跑步 40 分钟，11 点前睡，今天有点累"></textarea>
+      <textarea id="plan_text" placeholder="例：这周要复习高数、准备英语考试、每天跑步 30 分钟、11 点前睡"></textarea>
       <button class="act primary" onclick="doParse()">解析 →</button>
+      <button class="act" onclick="doAutoPlan()">⚡ 自动排程</button>
     </div>
     <div id="plan_status"></div>
     <div id="plan_ops"></div>
     <div class="section-t" style="margin-top:16px">今日日程</div>
     <div id="plan_schedule" class="muted">加载中…</div>
+    <div class="section-t" style="margin-top:16px">时间线 · 计划 vs 实际 <button class="act narrow" onclick="doReview()">🔍 AI 复盘</button></div>
+    <div id="plan_timeline" class="muted">加载中…</div>
     <div class="section-t" style="margin-top:16px">身心状态 · 睡眠 / 精力 / 专注 / 压力</div>
     <div id="plan_metrics" class="muted">加载中…</div>
   </div>`;
   secBody('plan').innerHTML=h;
-  refreshSchedule(); refreshMetrics();
+  refreshSchedule(); refreshMetrics(); loadTimeline();
 }
 
 async function doParse(){
@@ -986,6 +1163,62 @@ async function doParse(){
   if(r.parse_error){ document.getElementById('plan_ops').innerHTML='<div class="muted">没解析出来，试试换种说法。</div>'; return; }
   if(r.ambiguous){ st.innerHTML=`<div class="muted">⚠️ ${esc(r.ambiguous)}</div>`; }
   renderOps(r.ops||[]);
+}
+
+let autoPlanResult=null;
+async function doAutoPlan(){
+  const t=document.getElementById('plan_text').value.trim();
+  if(!t)return alert('先写要安排的内容/目标');
+  const st=document.getElementById('plan_status');
+  st.innerHTML='<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="loading-txt">AI 正在帮你排未来几天的日程…</span></div>';
+  document.getElementById('plan_ops').innerHTML='';
+  let r;
+  try{ r=await api(`/api/users/${cur}/auto-plan`,{content:t}); }
+  catch(e){ st.innerHTML=`<div class="muted">排程失败：${esc(e.message)}</div>`; return; }
+  st.innerHTML='';
+  if(r.parse_error){ document.getElementById('plan_ops').innerHTML='<div class="muted">没排出来，试试换种说法。</div>'; return; }
+  autoPlanResult=r;
+  renderAutoPlanPreview(r);
+}
+function renderAutoPlanPreview(r){
+  const el=document.getElementById('plan_ops');
+  const sched=(r.schedule||[]).map((s,i)=>
+    `<div class="sched-item" style="animation-delay:${i*50}ms"><span class="sched-time">${esc(s.date.slice(5))} ${esc(s.start_time||'')}-${esc(s.end_time||'')}</span><span class="sched-title">${esc(s.title)}</span></div>`).join('');
+  const todos=(r.todos||[]).map(t=>`<div class="sched-item"><span class="sched-time">待办</span><span class="sched-title">${esc(t.title)}</span></div>`).join('');
+  el.innerHTML=`<div class="section-t" style="margin-top:4px">⚡ 自动排程预览（${(r.schedule||[]).length} 日程 + ${(r.todos||[]).length} 待办）</div>
+    ${r.note?`<div class="muted">${esc(r.note)}</div>`:''}
+    ${sched||'<div class="muted">无日程</div>'}
+    ${todos?`<div class="muted" style="margin-top:6px">待办：</div>${todos}`:''}
+    <input id="plan_tags" placeholder="标签（逗号分隔，可选）如：学习,运动" style="margin-top:8px">
+    <div class="row" style="margin-top:10px"><button class="act primary" onclick="confirmAutoPlan()">✓ 确认写入</button><button class="act" onclick="document.getElementById('plan_ops').innerHTML=''">取消</button></div>`;
+}
+async function confirmAutoPlan(){
+  const el=document.getElementById('plan_ops');
+  el.innerHTML='<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="loading-txt">写入中…</span></div>';
+  let r;
+  const tags=(document.getElementById('plan_tags')||{}).value||'';
+  try{ r=await api(`/api/users/${cur}/auto-plan/apply`,{schedule:autoPlanResult.schedule||[], todos:autoPlanResult.todos||[], tags}); }
+  catch(e){ el.innerHTML=`<div class="muted">写入失败：${esc(e.message)}</div>`; return; }
+  el.innerHTML=`<span class="op-done-txt">✓ 已写入 ${r.goals} 个待办 / ${r.schedule} 个日程，并自动关联</span>`;
+  refreshSchedule(); refreshMetrics(); loadDiscipline();
+}
+
+async function loadTimeline(){
+  const el=document.getElementById('plan_timeline'); if(!el)return;
+  let tl=[];
+  try{ tl=await apiGet(`/api/users/${cur}/timeline?days=14`); }catch(e){ el.innerHTML='<div class="muted">时间线加载失败</div>'; return; }
+  el.innerHTML=tl.map(d=>{
+    const pct=d.planned?Math.round(d.done/d.planned*100):0;
+    return `<div class="timeline-row"><span class="tl-date">${esc(d.date.slice(5))}</span><span class="tl-bar"><span class="tl-fill" style="width:${pct}%"></span></span><span class="tl-num">${d.done}/${d.planned}</span><span class="tl-focus">${d.focus_min}min</span></div>`;
+  }).join('')||'<div class="muted">还没有数据。</div>';
+}
+async function doReview(){
+  const el=document.getElementById('plan_timeline'); if(!el)return;
+  el.innerHTML='<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="loading-txt">AI 复盘近 7 天…</span></div>';
+  let r;
+  try{ r=await api(`/api/users/${cur}/review`,{days:7}); }
+  catch(e){ el.innerHTML=`<div class="muted">复盘失败：${esc(e.message)}</div>`; return; }
+  el.innerHTML=`<div class="md">${fmtMd(r.review)}</div><button class="act" style="margin-top:8px" onclick="loadTimeline()">← 回到时间线</button>`;
 }
 
 function renderOps(ops){
@@ -1054,7 +1287,7 @@ async function refreshSchedule(){
   const labelOf=d=>{ if(d===days[0])return '今天'; if(d===days[1])return '明天'; return d.slice(5).replace('-','/'); };
   const html=days.map(d=>{
     const items=by[d]; if(!items.length)return '';
-    const rows=items.map((it,i)=>`<div class="sched-item ${it.status==='cancelled'?'cancelled':''}" style="animation-delay:${i*50}ms"><span class="sched-time">${esc(it.start_time||'—')}${it.end_time?'-'+esc(it.end_time):''}</span><span class="sched-title">${esc(it.title)}</span></div>`).join('');
+    const rows=items.map((it,i)=>`<div class="sched-item ${it.status==='cancelled'?'cancelled':''}" style="animation-delay:${i*50}ms"><span class="sched-time">${esc(it.start_time||'—')}${it.end_time?'-'+esc(it.end_time):''}</span><span class="sched-title">${esc(it.title)}${it.tags?` <span class="sched-tag">${esc(it.tags)}</span>`:''}</span></div>`).join('');
     return `<div class="sched-day-h">${labelOf(d)}</div>${rows}`;
   }).join('');
   el.innerHTML=html||'<div class="muted">未来 7 天还没排。</div>';

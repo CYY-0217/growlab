@@ -337,7 +337,7 @@ class MemoryEditIn(BaseModel):
 
 
 def _run_to_branches(run: dict, key_nodes: list) -> list[dict]:
-    """从一次 run 的 timeline 提取每个关键节点的用户说法 + 角色反应 + 评估。"""
+    """从一次 run 的 timeline 提取每个关键节点的用户说法 + 角色反应 + 评估 + 情绪。"""
     tl = run.get("timeline", [])
     branches = []
     for node in key_nodes:
@@ -359,6 +359,7 @@ def _run_to_branches(run: dict, key_nodes: list) -> list[dict]:
                 "node_label": node["label"],
                 "user_text": user_text,
                 "character_reply": char_reply or "",
+                "character_mood": eval_meta.get("character_mood", ""),
                 "eval": eval_meta,
             })
     return branches
@@ -367,8 +368,15 @@ def _run_to_branches(run: dict, key_nodes: list) -> list[dict]:
 # ---- 情境剧场 ----
 
 @app.get("/api/scenarios")
-def api_list_scenarios():
-    return database.list_scenarios()
+def api_list_scenarios(user_id: int | None = None):
+    scenes = database.list_scenarios()
+    if user_id:
+        for s in scenes:
+            runs = database.list_runs(user_id, s["id"])
+            s["run_count"] = len(runs)
+            s["user_turns"] = sum(
+                1 for r in runs for t in r["timeline"] if t.get("speaker") == "user")
+    return scenes
 
 
 @app.get("/api/scenarios/{sid}")
@@ -393,6 +401,8 @@ def api_scene_start(sid: str, inp: StartIn):
 
 @app.post("/api/scenes/run/{rid}/advance")
 def api_scene_advance(rid: int, inp: AdvanceIn):
+    if not agent_engine.is_configured():
+        return JSONResponse({"error": "DEEPSEEK_API_KEY 未配置，无法开始对话模拟"}, 503)
     run = database.get_run(rid)
     if not run:
         raise HTTPException(404, "run not found")
@@ -406,6 +416,9 @@ def api_scene_advance(rid: int, inp: AdvanceIn):
     if result.get("red_flag"):
         return {"red_flag": True, "message": result["message"]}
     eval_meta = result.get("eval", {})
+    # 情绪/好感变化挂在本轮 meta 里落库，重演与洞察都能取到
+    eval_meta["character_mood"] = result.get("character_mood", "")
+    eval_meta["relation_delta"] = result.get("relation_delta", 0)
     database.append_turn(rid, "user", inp.text, node["node_id"], eval_meta)
     database.append_turn(rid, sc["character_name"],
                          result["character_reply"], node["node_id"])
@@ -415,7 +428,9 @@ def api_scene_advance(rid: int, inp: AdvanceIn):
                         status="completed" if done else "active")
     if done:
         database.pet_reward(run["user_id"], 20, "study", "在情境剧场完成了一次练习")
-    return {"character_reply": result["character_reply"], "eval": eval_meta,
+    return {"character_reply": result["character_reply"], "eval": result.get("eval", {}),
+            "character_mood": result.get("character_mood", ""),
+            "relation_delta": result.get("relation_delta", 0),
             "next_node_id": next_id, "done": done}
 
 
@@ -457,6 +472,24 @@ def api_scene_compare(sid: str, inp: CompareIn):
     director = runs[-1]["director"] if runs else {}
     md = agent_engine.scene_compare(sc, branches, director)
     return {"compare": md, "branches": branches}
+
+
+@app.post("/api/scenes/{sid}/insight")
+def api_scene_insight(sid: str, inp: CompareIn):
+    """成长洞察：通读本情境所有分支，指出跨场次的行为模式（理解自己）。"""
+    if not agent_engine.is_configured():
+        return JSONResponse({"error": "DEEPSEEK_API_KEY 未配置"}, 503)
+    sc = database.get_scenario(sid)
+    if not sc:
+        raise HTTPException(404, "scenario not found")
+    runs = database.list_runs(inp.user_id, sc["id"])
+    branches = []
+    for r in runs:
+        branches.extend(_run_to_branches(r, sc["key_nodes"]))
+    if len(branches) < 2:
+        return {"error": "至少练过两个关键节点才有模式可看，先完成一次练习（或重演一个分支）"}
+    md = agent_engine.scene_insight(sc, branches)
+    return {"insight": md, "branches": len(branches)}
 
 
 @app.post("/api/scenes/{sid}/experiment-plan")
@@ -951,3 +984,76 @@ def api_get_rest(uid: int):
 def api_add_rest(uid: int, inp: RestIn):
     rid = database.add_rest_window(uid, inp.start_time, inp.end_time, inp.label, inp.days)
     return {"id": rid}
+
+
+class AutoPlanIn(BaseModel):
+    content: str
+
+
+class AutoPlanApplyIn(BaseModel):
+    schedule: list
+    todos: list
+    tags: str = ""
+
+
+@app.post("/api/users/{uid}/auto-plan")
+def api_auto_plan(uid: int, inp: AutoPlanIn):
+    user = database.get_user(uid)
+    if not user:
+        raise HTTPException(404, "user not found")
+    if not agent_engine.is_configured():
+        return JSONResponse({"error": "DEEPSEEK_API_KEY 未配置"}, 503)
+    return agent_engine.auto_plan(user, inp.content)
+
+
+@app.post("/api/users/{uid}/auto-plan/apply")
+def api_auto_plan_apply(uid: int, inp: AutoPlanApplyIn):
+    result = planning.apply_auto_plan(uid, inp.schedule, inp.todos, inp.tags)
+    return {"ok": True, **result}
+
+
+class TagIn(BaseModel):
+    tags: str
+
+
+class ReviewIn(BaseModel):
+    days: int = 7
+
+
+@app.get("/api/users/{uid}/timeline")
+def api_timeline(uid: int, days: int = 14):
+    """时间线：过去 N 天的计划 vs 实际。"""
+    out = []
+    for i in range(days):
+        d = (date.today() - timedelta(days=days - 1 - i)).isoformat()
+        sched = database.list_schedule(uid, d)
+        row = database.get_conn().execute(
+            "SELECT focus_min FROM daily_entries WHERE user_id=? AND entry_date=?",
+            (uid, d)).fetchone()
+        focus = (row["focus_min"] or 0) if row else 0
+        done = sum(1 for s in sched if s["status"] == "done")
+        out.append({"date": d, "planned": len(sched), "done": done,
+                    "focus_min": focus, "items": sched})
+    return out
+
+
+@app.post("/api/goals/{gid}/tags")
+def api_set_goal_tags(gid: int, inp: TagIn):
+    database.set_goal_tags(gid, inp.tags)
+    return {"ok": True}
+
+
+@app.post("/api/schedule/{sid}/tags")
+def api_set_schedule_tags(sid: int, inp: TagIn):
+    database.set_schedule_tags(sid, inp.tags)
+    return {"ok": True}
+
+
+@app.post("/api/users/{uid}/review")
+def api_review(uid: int, inp: ReviewIn):
+    user = database.get_user(uid)
+    if not user:
+        raise HTTPException(404, "user not found")
+    if not agent_engine.is_configured():
+        return JSONResponse({"error": "DEEPSEEK_API_KEY 未配置"}, 503)
+    return {"review": agent_engine.review(user, inp.days)}
