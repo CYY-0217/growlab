@@ -31,6 +31,9 @@ def _seed_scenarios():
         database.seed_scenario(sc)
     for card in CARDS:
         database.seed_card(card)
+    # 若无用户，自动建一个默认学习者，打开即可用（不导入假种子数据）
+    if not database.list_users():
+        database.add_user("我", "balance", "默认学习者")
 
 
 # ---------- 页面 ----------
