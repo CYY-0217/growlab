@@ -42,7 +42,7 @@
 [data-theme="seder-iris"] .bg::after{background:radial-gradient(130% 95% at 50% 42%, rgba(216,212,200,.82) 32%, rgba(216,212,200,.55) 78%, rgba(216,212,200,.30) 100%)}
 [data-theme="seder-pergament"] .bg::after{background:radial-gradient(130% 95% at 50% 42%, rgba(237,228,208,.82) 32%, rgba(237,228,208,.55) 78%, rgba(237,228,208,.30) 100%)}
 [data-theme="seder-distel"] .bg::after{background:radial-gradient(130% 95% at 50% 42%, rgba(227,213,191,.82) 32%, rgba(227,213,191,.55) 78%, rgba(227,213,191,.30) 100%)}
-select.theme-sel{appearance:none;-webkit-appearance:none;cursor:pointer;background:var(--surface);color:var(--muted);font:inherit;padding:5px 10px}
+select.theme-sel{appearance:none;-webkit-appearance:none;cursor:pointer;background:var(--surface);color:var(--muted);font:inherit;padding:5px 10px;position:fixed;top:auto;bottom:14px;right:14px;z-index:200}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
   background:var(--bg);color:var(--text);line-height:1.65;
@@ -468,6 +468,7 @@ h1 .fl{font-size:16px}
 /* ===== 分页模式：一次一个空间 ===== */
 .sec{display:none}
 .sec.active{display:block}
+.sec.active .sec-h,.sec.active .sec-body{opacity:1;transform:none}
 .sec.page-next{animation:pageInNext .42s var(--ease)}
 .sec.page-prev{animation:pageInPrev .42s var(--ease)}
 @keyframes pageInNext{from{opacity:0;transform:translateX(38px)}to{opacity:1;transform:none}}
