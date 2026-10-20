@@ -80,3 +80,7 @@ growlab/
 ## 🏆 参赛信息
 
 大学生 OPC 创新创业 · AI Agent 赛道（中山大学 · 理学院）
+
+## 📦 历史与前身
+
+- [50-Day-Discipline](https://github.com/CYY-0217/50-Day-Discipline) — GrowLab 的早期自律打卡器，单文件原型，已归档（其内容后并入「自律」空间）
